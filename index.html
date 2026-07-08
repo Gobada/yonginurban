@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>매주 그림 인증</title>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet" />
 <style>
   :root{
     --paper:#F2F8F3; --card:#FFFFFF; --ink:#1E2A22; --muted:#7C8C7E;
@@ -49,8 +52,8 @@
   .hero{padding:34px 0 8px; text-align:center}
   .hero .mark{line-height:1}
   .stamp-mark{display:flex; justify-content:center}
-  .stamp-mark svg{width:86px; height:86px; color:var(--stamp)}
-  .hero h1{font-size:26px; font-weight:800; letter-spacing:-.03em; margin:14px 0 6px}
+  .stamp-mark img{width:min(140px,41%); height:auto; display:block}
+  .hero h1{font-family:"궁서","Gungsuh",GungsuhChe,"Nanum Myeongjo",serif; font-size:34px; font-weight:800; letter-spacing:-.01em; margin:14px 0 6px; color:var(--stamp)}
   .hero p{color:var(--muted); font-size:14px; margin:0 auto; max-width:340px}
   .form-card{background:var(--card); border:1px solid var(--line); border-radius:18px;
     box-shadow:var(--shadow); padding:22px; margin:22px 0}
@@ -78,16 +81,18 @@
   .pcard{background:var(--card); border:1px solid var(--line); border-radius:16px;
     box-shadow:var(--shadow); padding:14px 15px; margin:0 0 12px}
   .pcard.me{border:2px solid var(--stamp); background:linear-gradient(#fff,#FAFDFB)}
-  .pcard .phead{display:flex; align-items:center; gap:8px; margin-bottom:12px}
+  .pcard .phead{display:flex; align-items:center; gap:6px; margin-bottom:12px; flex-wrap:wrap}
   .pname{font-weight:800; font-size:16px; letter-spacing:-.02em}
   .metag{font-size:11px; font-weight:800; color:#fff; background:var(--stamp);
     padding:2px 8px; border-radius:999px}
   .count{margin-left:auto; font-size:12.5px; color:var(--muted); font-weight:700}
   .p4tag{font-size:11.5px; color:var(--muted); font-weight:700}
-  .adm-edit{margin-left:8px; border:none; background:var(--stamp-soft); color:var(--stamp);
+  .adm-edit{border:none; background:var(--stamp-soft); color:var(--stamp);
     font-size:11px; font-weight:800; padding:4px 8px; border-radius:8px}
   .adm-edit.on{background:var(--stamp); color:#fff}
-  .adm-x{margin-left:8px; border:none; background:var(--warn-soft); color:#B23;
+  .adm-info{border:none; background:var(--stamp-soft); color:var(--stamp);
+    font-size:11px; font-weight:800; padding:4px 8px; border-radius:8px}
+  .adm-x{border:none; background:var(--warn-soft); color:#B23;
     font-size:11px; font-weight:800; padding:4px 8px; border-radius:8px}
 
   .weeks{display:grid; grid-template-columns:repeat(5,1fr); gap:9px}
@@ -132,6 +137,7 @@
   .img-cap{text-align:center; color:var(--muted); font-size:13px; margin-top:10px}
   .modal-actions{display:flex; gap:10px; margin-top:16px}
   .modal-actions .primary{margin-top:0}
+  .admpw-fld{letter-spacing:.15em}
   .drop{border:2px dashed var(--line); border-radius:14px; padding:24px; text-align:center;
     color:var(--muted); font-size:14px; background:#F7FBF8; display:block}
   .drop.has{border-color:var(--good); color:var(--ink)}
@@ -146,6 +152,17 @@
   .center-load{text-align:center; padding:60px 0; color:var(--muted)}
   .ver{text-align:center; color:var(--muted); opacity:.6; font-size:11px; font-weight:600;
     letter-spacing:.02em; margin:28px 0 6px}
+  .fab{position:fixed; left:50%; bottom:20px; transform:translateX(-50%); z-index:40;
+    border:none; background:var(--stamp); color:#fff; font-weight:800; font-size:15px;
+    padding:14px 28px; border-radius:999px; box-shadow:0 6px 20px rgba(30,70,45,.28)}
+  .fab:active{transform:translateX(-50%) translateY(1px)}
+  .stat-row{display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--line)}
+  .stat-row:last-of-type{border-bottom:none}
+  .stat-badge{flex:0 0 auto; min-width:44px; text-align:center; background:var(--stamp); color:#fff;
+    font-weight:800; font-size:13px; padding:5px 8px; border-radius:9px}
+  .stat-badge.zero{background:#EEEDF4; color:var(--muted)}
+  .stat-names{font-size:14px; line-height:1.55; padding-top:2px}
+  .stat-names b{color:var(--stamp)}
 </style>
 </head>
 <body>
@@ -154,6 +171,7 @@
   <div class="top-inner">
     <div class="brand">매주 그림 인증<small id="hdrsub">불러오는 중…</small></div>
     <button class="ghost-btn" id="trashBtn" style="display:none">🗑️ 휴지통</button>
+    <button class="ghost-btn" id="infoBtn" style="display:none">✏️ 정보수정</button>
     <button class="ghost-btn" id="whoBtn" style="display:none"></button>
     <button class="ghost-btn" id="admBtn">관리자</button>
   </div>
@@ -164,35 +182,8 @@
 
   <section id="loginView">
     <div class="hero">
-      <div class="mark stamp-mark" aria-hidden="true">
-        <svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
-          <g transform="rotate(-7 70 74)">
-            <circle cx="70" cy="74" r="60" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="7 4" opacity=".8"/>
-            <circle cx="70" cy="80" r="33" fill="none" stroke="currentColor" stroke-width="3"/>
-            <circle cx="70" cy="80" r="22" fill="none" stroke="currentColor" stroke-width="2" opacity=".75"/>
-            <g stroke="currentColor" stroke-width="2">
-              <line x1="70" y1="80" x2="70" y2="47"/>
-              <line x1="70" y1="80" x2="98" y2="63"/>
-              <line x1="70" y1="80" x2="98" y2="97"/>
-              <line x1="70" y1="80" x2="70" y2="113"/>
-              <line x1="70" y1="80" x2="42" y2="97"/>
-              <line x1="70" y1="80" x2="42" y2="63"/>
-            </g>
-            <g fill="currentColor">
-              <circle cx="70" cy="47" r="6.5"/>
-              <circle cx="98" cy="63" r="6.5"/>
-              <circle cx="98" cy="97" r="6.5"/>
-              <circle cx="70" cy="113" r="6.5"/>
-              <circle cx="42" cy="97" r="6.5"/>
-              <circle cx="42" cy="63" r="6.5"/>
-            </g>
-            <g fill="currentColor" opacity=".8">
-              <path d="M24 26 l2.4 6.2 l6.2 2.4 l-6.2 2.4 l-2.4 6.2 l-2.4 -6.2 l-6.2 -2.4 l6.2 -2.4 z"/>
-              <circle cx="14" cy="42" r="1.8"/>
-              <circle cx="36" cy="18" r="1.4"/>
-            </g>
-          </g>
-        </svg>
+      <div class="mark stamp-mark">
+        <img src="yonginurban_stamp_green.png" alt="Urban Sketch Yongin 도장" />
       </div>
       <h1>어사출도 출석도장 찍기!</h1>
       <p>닉네임과 전화번호 뒷 4자리로 들어오세요.</p>
@@ -207,7 +198,7 @@
         </div>
       </div>
       <button class="primary" id="loginBtn">들어가기</button>
-      <div class="hint">처음이면 등록 요청이 관리자에게 전달돼요. 승인되면 인증할 수 있어요.</div>
+      <div class="hint">처음이면 등록 요청이 관리자에게 전달돼요.<br>승인되면 인증할 수 있어요.</div>
     </div>
   </section>
 
@@ -228,6 +219,8 @@
 <div class="overlay" id="ov">
   <div class="modal" id="modalBox"></div>
 </div>
+
+<button class="fab" id="statBtn" style="display:none">📊 통계</button>
 
 <div class="toast" id="toast"></div>
 
@@ -256,7 +249,7 @@ const firebaseConfig = {
 const ADMIN_PASSWORD = "1234";
 
 /* 버전 표시 (수정할 때마다 올려주면 배포 반영 확인용) */
-const APP_VERSION = "v2026.07.08d · 관리자 수정모드/휴지통/그린테마";
+const APP_VERSION = "v2026.07.09d";
 
 /* 인증 일정: 매주 화 06:00 ~ 다음 월 18:00 (한국시간), 7/7(화) 시작, 10주 */
 const TOTAL_WEEKS = 10;
@@ -390,6 +383,21 @@ function updateWhoBtn(){
   } else {
     trashBtn.style.display='none';
   }
+  const infoBtn = document.getElementById('infoBtn');
+  if(me && !isAdmin){
+    infoBtn.style.display='inline-block';
+    infoBtn.onclick = ()=> openEditInfo(me.id);
+  } else {
+    infoBtn.style.display='none';
+  }
+  const statBtn = document.getElementById('statBtn');
+  if(isAdmin){
+    statBtn.style.display='inline-block';
+    document.body.style.paddingBottom='88px';
+  } else {
+    statBtn.style.display='none';
+    document.body.style.paddingBottom='';
+  }
   const b = document.getElementById('whoBtn');
   if(me){
     b.style.display='inline-block';
@@ -435,7 +443,7 @@ function renderBoard(now){
       if(cert){
         const editable = (mine && st==='open') || editing;
         cells += `<div class="cell done ${editable?'editable-done':''}"
-                       data-act="${editable?'edit':'view'}" data-pid="${p.id}" data-week="${k}">
+                       data-act="view" data-pid="${p.id}" data-week="${k}">
                     <span class="wn">${k}주</span><span class="ck">✓</span></div>`;
       } else if(mine && st==='open'){
         cells += `<div class="cell open pulse" data-act="upload" data-pid="${p.id}" data-week="${k}">
@@ -449,7 +457,7 @@ function renderBoard(now){
     }
     const admCtl = isAdmin
       ? (editing
-          ? `<button class="adm-edit on" data-act="edtoggle" data-pid="${p.id}">완료</button><button class="adm-x" data-act="delp" data-pid="${p.id}">참가자삭제</button>`
+          ? `<button class="adm-edit on" data-act="edtoggle" data-pid="${p.id}">완료</button><button class="adm-info" data-act="editinfo" data-pid="${p.id}">정보수정</button><button class="adm-x" data-act="delp" data-pid="${p.id}">참가자삭제</button>`
           : `<button class="adm-edit" data-act="edtoggle" data-pid="${p.id}">수정</button>`)
       : '';
     return `<div class="pcard ${mine?'me':''}">
@@ -476,6 +484,9 @@ function renderBoard(now){
       adminEditPid = (adminEditPid===b.dataset.pid) ? null : b.dataset.pid;
       render();
     };
+  });
+  box.querySelectorAll('[data-act="editinfo"]').forEach(b=>{
+    b.onclick = ()=> openEditInfo(b.dataset.pid);
   });
   box.querySelectorAll('[data-act="delp"]').forEach(b=>{
     b.onclick = ()=> deleteParticipant(b.dataset.pid);
@@ -553,6 +564,46 @@ function askRegister(nickname, last4){
       });
       hideOverlay(); toast('신청 완료! 관리자 승인을 기다려주세요 🙌');
     }catch(e){ console.error(e); toast('등록 실패. 다시 시도해주세요.'); b.disabled=false; b.textContent='등록 요청'; }
+  };
+}
+
+function openEditInfo(pid){
+  const p = people.find(x=>x.id===pid);
+  if(!p){ toast('참가자 정보를 찾을 수 없어요'); return; }
+  const box = document.getElementById('modalBox');
+  box.innerHTML = `
+    <h3>정보 수정</h3>
+    <p class="sub">닉네임과 전화번호 뒷 4자리를 바꿀 수 있어요.</p>
+    <label class="fl" for="eiNick">닉네임</label>
+    <input class="fld" id="eiNick" value="${esc(p.nickname||'')}" autocomplete="off" />
+    <label class="fl" for="eiP4" style="margin-top:14px">전화번호 뒷 4자리</label>
+    <input class="fld" id="eiP4" inputmode="numeric" maxlength="4" value="${esc(p.last4||'')}" autocomplete="off" />
+    <div class="modal-actions">
+      <button class="primary sec" id="eiCancel">취소</button>
+      <button class="primary" id="eiSave">저장</button>
+    </div>`;
+  showOverlay();
+  document.getElementById('eiCancel').onclick = hideOverlay;
+  document.getElementById('eiSave').onclick = async ()=>{
+    const nickname = document.getElementById('eiNick').value.trim();
+    const last4 = document.getElementById('eiP4').value.trim();
+    if(!nickname){ toast('닉네임을 입력해주세요'); return; }
+    if(!/^\d{4}$/.test(last4)){ toast('전화번호 뒷 4자리(숫자)를 정확히 입력해주세요'); return; }
+    const btn = document.getElementById('eiSave'); btn.disabled=true; btn.innerHTML='<span class="busy"></span>저장 중';
+    try{
+      if(nickname !== p.nickname){
+        const dup = await db.collection('participants').where('nickname','==',nickname).limit(1).get();
+        if(!dup.empty && dup.docs[0].id !== pid){
+          toast('이미 있는 닉네임이에요. 다른 걸로 해주세요.'); btn.disabled=false; btn.textContent='저장'; return;
+        }
+      }
+      await db.collection('participants').doc(pid).update({ nickname, last4 });
+      if(me && me.id===pid){
+        me = {...me, nickname, last4};
+        sessionStorage.setItem('me', JSON.stringify({id:me.id, nickname, last4}));
+      }
+      hideOverlay(); toast('정보를 수정했어요 ✅');
+    }catch(e){ console.error(e); toast('수정 실패. 다시 시도해주세요.'); btn.disabled=false; btn.textContent='저장'; }
   };
 }
 
@@ -650,8 +701,8 @@ function openImage(pid, week){
     <img class="img-view" src="${cert.url}" alt="${week}주차 인증" />
     <div class="img-cap">${new Date(cert.updatedAt||Date.now()).toLocaleString('ko-KR')}</div>
     <div class="modal-actions">
-      <button class="primary sec" id="ivClose">닫기</button>
-      ${canEdit?`<button class="primary" id="ivEdit">수정</button>`:''}
+      <button class="primary sec" id="ivClose">취소</button>
+      ${canEdit?`<button class="primary" id="ivEdit">수정하기</button>`:''}
       ${adminEditing?`<button class="primary" id="ivDel" style="background:var(--warn)">삭제</button>`:''}
     </div>`;
   showOverlay();
@@ -676,11 +727,36 @@ async function deleteCert(pid, week){
 document.getElementById('admBtn').onclick = ()=>{
   const b=document.getElementById('admBtn');
   if(isAdmin){ isAdmin=false; adminEditPid=null; b.classList.remove('on'); b.textContent='관리자'; render(); toast('관리자 모드 해제'); return; }
-  const pw = prompt('관리자 비밀번호');
-  if(pw===null) return;
-  if(pw===ADMIN_PASSWORD){ isAdmin=true; b.classList.add('on'); b.textContent='관리자 ✓'; render(); toast('관리자 모드 ON'); }
-  else toast('비밀번호가 틀렸어요');
+  openAdminLogin();
 };
+
+function openAdminLogin(){
+  const box = document.getElementById('modalBox');
+  box.innerHTML = `
+    <h3>관리자 모드</h3>
+    <p class="sub">비밀번호를 입력해주세요.</p>
+    <input class="fld admpw-fld" type="password" id="admPw" inputmode="numeric" autocomplete="off" placeholder="비밀번호" />
+    <div class="modal-actions">
+      <button class="primary sec" id="admCancel">취소</button>
+      <button class="primary" id="admOk">확인</button>
+    </div>`;
+  showOverlay();
+  const input = document.getElementById('admPw');
+  input.focus();
+  const submit = ()=>{
+    const b=document.getElementById('admBtn');
+    if(input.value===ADMIN_PASSWORD){
+      isAdmin=true; b.classList.add('on'); b.textContent='관리자 ✓';
+      hideOverlay(); render(); toast('관리자 모드 ON');
+    } else {
+      toast('비밀번호가 틀렸어요');
+      input.value=''; input.focus();
+    }
+  };
+  document.getElementById('admCancel').onclick = hideOverlay;
+  document.getElementById('admOk').onclick = submit;
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter') submit(); });
+}
 
 async function setStatus(pid, status){
   try{ await db.collection('participants').doc(pid).update({status});
@@ -736,6 +812,37 @@ async function restoreParticipant(pid){
   }catch(e){ console.error(e); toast('복구 실패'); }
 }
 document.getElementById('trashBtn').onclick = openTrash;
+
+function openStats(){
+  const box = document.getElementById('modalBox');
+  const approved = people.filter(p=>p.status==='approved');
+  const groups = {}; // 인증횟수 -> [닉네임]
+  approved.forEach(p=>{
+    const c = Object.keys(p.weeks||{}).length;
+    (groups[c] = groups[c] || []).push(p.nickname);
+  });
+  const counts = Object.keys(groups).map(Number).sort((a,b)=>b-a);
+  let rows;
+  if(!approved.length){
+    rows = `<div class="empty-state">승인된 참가자가 없어요.</div>`;
+  } else {
+    rows = counts.map(c=>{
+      const names = groups[c].sort((a,b)=>a.localeCompare(b,'ko'));
+      return `<div class="stat-row">
+        <div class="stat-badge ${c>0?'':'zero'}">${c}회</div>
+        <div class="stat-names"><b>${names.length}명</b> · ${names.map(esc).join(', ')}</div>
+      </div>`;
+    }).join('');
+  }
+  box.innerHTML = `
+    <h3>📊 인증 통계</h3>
+    <p class="sub">인증 횟수가 많은 순이에요. (전체 ${approved.length}명 · 총 ${TOTAL_WEEKS}주)</p>
+    ${rows}
+    <div class="modal-actions"><button class="primary sec" id="stClose">닫기</button></div>`;
+  showOverlay();
+  document.getElementById('stClose').onclick = hideOverlay;
+}
+document.getElementById('statBtn').onclick = openStats;
 
 /* HEIC(아이폰/맥 기본 사진 포맷)면 JPEG로 먼저 변환. 아니면 원본 그대로 반환 */
 async function toDecodable(file){
