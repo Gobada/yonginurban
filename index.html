@@ -220,6 +220,10 @@
   <div class="modal" id="modalBox"></div>
 </div>
 
+<div class="overlay" id="ov2" style="z-index:60">
+  <div class="modal" id="confirmBox" style="max-width:360px"></div>
+</div>
+
 <button class="fab" id="statBtn" style="display:none">📊 통계</button>
 
 <div class="toast" id="toast"></div>
@@ -249,7 +253,7 @@ const firebaseConfig = {
 const ADMIN_PASSWORD = "1234";
 
 /* 버전 표시 (수정할 때마다 올려주면 배포 반영 확인용) */
-const APP_VERSION = "v2026.07.10 · 에메랄드 테마";
+const APP_VERSION = "v2026.07.10b";
 
 /* 인증 일정: 매주 화 06:00 ~ 다음 월 18:00 (한국시간), 7/7(화) 시작, 10주 */
 const TOTAL_WEEKS = 10;
@@ -332,7 +336,7 @@ function fmt(ms){
   return `${mm}/${dd}(${wd}) ${hh}:00`;
 }
 
-function render(){
+function renderNow(){
   const now = Date.now();
   renderPeriod(now);
   if(!me && !isAdmin){ showLogin(); return; }
@@ -471,27 +475,25 @@ function renderBoard(now){
       <div class="weeks">${cells}</div>
     </div>`;
   }).join('');
-
-  box.querySelectorAll('.cell[data-act]').forEach(c=>{
-    c.onclick = ()=>{
-      const act=c.dataset.act, pid=c.dataset.pid, wk=+c.dataset.week;
-      if(act==='view') openImage(pid,wk);
-      else if(act==='upload'||act==='edit') openUpload(pid,wk);
-    };
-  });
-  box.querySelectorAll('[data-act="edtoggle"]').forEach(b=>{
-    b.onclick = ()=>{
-      adminEditPid = (adminEditPid===b.dataset.pid) ? null : b.dataset.pid;
-      render();
-    };
-  });
-  box.querySelectorAll('[data-act="editinfo"]').forEach(b=>{
-    b.onclick = ()=> openEditInfo(b.dataset.pid);
-  });
-  box.querySelectorAll('[data-act="delp"]').forEach(b=>{
-    b.onclick = ()=> deleteParticipant(b.dataset.pid);
-  });
+  // 클릭은 boardList에 위임(아래 1회 등록) — 매 렌더마다 핸들러를 다시 붙이지 않음
 }
+
+/* 보드 클릭 이벤트 위임: 카드/셀이 수백 개여도 리스너는 1개만 유지 */
+document.getElementById('boardList').addEventListener('click', (e)=>{
+  const cell = e.target.closest('.cell[data-act]');
+  if(cell){
+    const act=cell.dataset.act, pid=cell.dataset.pid, wk=+cell.dataset.week;
+    if(act==='view') openImage(pid,wk);
+    else if(act==='upload'||act==='edit') openUpload(pid,wk);
+    return;
+  }
+  const btn = e.target.closest('[data-act]');
+  if(!btn) return;
+  const pid=btn.dataset.pid, act=btn.dataset.act;
+  if(act==='edtoggle'){ adminEditPid = (adminEditPid===pid) ? null : pid; render(); }
+  else if(act==='editinfo'){ openEditInfo(pid); }
+  else if(act==='delp'){ deleteParticipant(pid); }
+});
 
 function renderAdminPending(now){
   const box = document.getElementById('adminPending');
@@ -649,6 +651,7 @@ function openUpload(pid, week){
     okB.disabled = true;
     try{
       pendingBlob = await compress(f);
+      if(prev.src && prev.src.startsWith('blob:')) URL.revokeObjectURL(prev.src);
       prev.src = URL.createObjectURL(pendingBlob); prev.style.display='block';
       drop.textContent='✅ 사진 준비됨 (다시 누르면 변경)'; drop.classList.add('has');
       okB.disabled=false;
@@ -712,7 +715,8 @@ function openImage(pid, week){
 }
 
 async function deleteCert(pid, week){
-  if(!confirm(`${week}주차 인증을 삭제할까요?`)) return;
+  const ok = await confirmDialog(`${week}주차 인증을 삭제할까요?`, {okText:'삭제', danger:true});
+  if(!ok) return;
   try{
     const p = people.find(x=>x.id===pid);
     const path = p?.weeks?.[String(week)]?.path;
@@ -765,7 +769,8 @@ async function setStatus(pid, status){
 }
 async function deleteParticipant(pid){
   const p = people.find(x=>x.id===pid);
-  if(!confirm(`"${p?.nickname}" 참가자를 휴지통으로 옮길까요? (인증 기록은 유지되고, 나중에 복구할 수 있어요)`)) return;
+  const ok = await confirmDialog('인증 기록은 유지되고, 나중에 복구할 수 있어요.', {title:`"${p?.nickname}" 휴지통으로`, okText:'휴지통으로'});
+  if(!ok) return;
   try{
     await db.collection('participants').doc(pid).update({
       status:'trashed', prevStatus: p?.status||'approved', trashedAt: Date.now()
@@ -788,6 +793,7 @@ function openTrash(){
         <span class="pn">${esc(p.nickname)}</span>
         <span class="p4">···${esc(p.last4||'')}</span>
         <button class="mini ok" data-restore="${p.id}">복구</button>
+        <button class="mini no" data-del="${p.id}">삭제</button>
       </div>`).join('') : `<div class="empty-state">휴지통이 비어있어요.</div>`}
     <div class="modal-actions">
       <button class="primary sec" id="trashClose">닫기</button>
@@ -797,6 +803,21 @@ function openTrash(){
   box.querySelectorAll('[data-restore]').forEach(b=>{
     b.onclick = ()=> restoreParticipant(b.dataset.restore);
   });
+  box.querySelectorAll('[data-del]').forEach(b=>{
+    b.onclick = ()=> purgeParticipant(b.dataset.del);
+  });
+}
+
+async function purgeParticipant(pid){
+  const p = people.find(x=>x.id===pid);
+  const ok = await confirmDialog('삭제하면 복구할 수 없습니다. 삭제할까요?', {title:`"${p?.nickname}" 영구 삭제`, okText:'삭제', danger:true});
+  if(!ok) return;
+  try{
+    if(p?.weeks) for(const k in p.weeks){ if(p.weeks[k].path) storage.ref(p.weeks[k].path).delete().catch(()=>{}); }
+    await db.collection('participants').doc(pid).delete();
+    toast('영구 삭제했어요');
+    openTrash();
+  }catch(e){ console.error(e); toast('삭제 실패'); }
 }
 
 async function restoreParticipant(pid){
@@ -873,10 +894,48 @@ async function compress(file){
 }
 function esc(s){ return String(s??'').replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
 function showOverlay(){ document.getElementById('ov').classList.add('show'); }
-function hideOverlay(){ document.getElementById('ov').classList.remove('show'); pendingBlob=null; }
+function hideOverlay(){
+  document.getElementById('ov').classList.remove('show'); pendingBlob=null;
+  const prev = document.getElementById('prev');
+  if(prev && prev.src && prev.src.startsWith('blob:')){ URL.revokeObjectURL(prev.src); prev.removeAttribute('src'); }
+}
 document.getElementById('ov').addEventListener('click', e=>{ if(e.target.id==='ov') hideOverlay(); });
 
-setInterval(render, 60*1000); // 1분마다 주차 상태 갱신(마감 자동 잠금)
+/* 스택 가능한 커스텀 확인 팝업 (네이티브 confirm 대체) */
+function confirmDialog(message, {title='확인', okText='확인', danger=false}={}){
+  return new Promise(resolve=>{
+    const ov2 = document.getElementById('ov2');
+    document.getElementById('confirmBox').innerHTML = `
+      <h3>${esc(title)}</h3>
+      <p class="sub" style="margin-bottom:2px">${esc(message)}</p>
+      <div class="modal-actions">
+        <button class="primary sec" id="cfCancel">취소</button>
+        <button class="primary" id="cfOk"${danger?' style="background:var(--warn)"':''}>${esc(okText)}</button>
+      </div>`;
+    ov2.classList.add('show');
+    const close = (val)=>{ ov2.classList.remove('show'); ov2.onclick=null; resolve(val); };
+    document.getElementById('cfCancel').onclick = ()=>close(false);
+    document.getElementById('cfOk').onclick = ()=>close(true);
+    ov2.onclick = (e)=>{ if(e.target===ov2) close(false); };
+  });
+}
+
+/* render 코얼레싱: 짧은 시간 내 여러 번 호출돼도 프레임당 1회만 실제 렌더 */
+let _renderScheduled = false;
+function render(){
+  if(_renderScheduled) return;
+  _renderScheduled = true;
+  requestAnimationFrame(()=>{ _renderScheduled = false; renderNow(); });
+}
+
+/* 1분마다 주차 상태가 실제로 바뀔 때만 다시 그림 (불필요한 전체 리렌더 방지) */
+function weekSig(now){ let s=''; for(let k=1;k<=TOTAL_WEEKS;k++) s+=weekState(k,now)[0]; return s; }
+let _lastWeekSig = null;
+setInterval(()=>{
+  const sig = weekSig(Date.now());
+  if(_lastWeekSig===null){ _lastWeekSig = sig; return; }
+  if(sig!==_lastWeekSig){ _lastWeekSig = sig; render(); }
+}, 60*1000);
 </script>
 </body>
 </html>
