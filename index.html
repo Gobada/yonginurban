@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>매주 그림 인증</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+  :root{
+    --paper:#F6F5FB; --card:#FFFFFF; --ink:#232238; --muted:#8C8AA6;
+    --line:#E7E4F2; --stamp:#6D4AFF; --stamp-soft:#EFEBFF;
+    --good:#10B6A0; --good-soft:#E1F7F3; --warn:#FF6B6B; --warn-soft:#FFECEC;
+    --shadow:0 2px 10px rgba(60,50,120,.06), 0 8px 30px rgba(60,50,120,.05);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Pretendard","Pretendard Variable",system-ui,-apple-system,sans-serif;
+    background:var(--paper); color:var(--ink); line-height:1.5;
+    -webkit-font-smoothing:antialiased; padding-bottom:40px;
+  }
+  .wrap{max-width:640px; margin:0 auto; padding:0 16px}
+  a{color:var(--stamp)}
+  button{font-family:inherit; cursor:pointer}
+
+  header.top{
+    position:sticky; top:0; z-index:20; background:rgba(246,245,251,.86);
+    backdrop-filter:saturate(160%) blur(10px); border-bottom:1px solid var(--line);
+  }
+  .top-inner{max-width:640px; margin:0 auto; padding:12px 16px; display:flex; align-items:center; gap:10px}
+  .brand{font-weight:800; font-size:19px; letter-spacing:-.02em; flex:1}
+  .brand small{display:block; font-weight:600; font-size:12px; color:var(--muted); letter-spacing:0}
+  .ghost-btn{
+    border:1px solid var(--line); background:var(--card); color:var(--muted);
+    border-radius:10px; padding:8px 10px; font-size:13px; font-weight:600;
+  }
+  .ghost-btn.on{color:var(--stamp); border-color:var(--stamp); background:var(--stamp-soft)}
+
+  #banner{display:none; margin:14px 0 0; padding:12px 14px; border-radius:12px;
+    font-size:13px; font-weight:600; background:var(--warn-soft); color:#B23}
+  #banner.show{display:block}
+
+  .period{margin:16px 0 4px; display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+  .pill{font-size:12.5px; font-weight:700; padding:6px 11px; border-radius:999px;
+    background:var(--stamp-soft); color:var(--stamp)}
+  .pill.gray{background:#EEEDF4; color:var(--muted)}
+  .pill.done{background:var(--good-soft); color:#0A7A6B}
+
+  .hero{padding:34px 0 8px; text-align:center}
+  .hero .mark{font-size:44px; line-height:1}
+  .hero h1{font-size:26px; font-weight:800; letter-spacing:-.03em; margin:14px 0 6px}
+  .hero p{color:var(--muted); font-size:14px; margin:0 auto; max-width:340px}
+  .form-card{background:var(--card); border:1px solid var(--line); border-radius:18px;
+    box-shadow:var(--shadow); padding:22px; margin:22px 0}
+  label.fl{display:block; font-size:13px; font-weight:700; margin:0 0 6px; color:var(--ink)}
+  label.fl span{color:var(--muted); font-weight:500}
+  .fld{width:100%; border:1px solid var(--line); border-radius:12px; padding:13px 14px;
+    font-size:16px; font-family:inherit; background:#FBFAFE; color:var(--ink); outline:none}
+  .fld:focus{border-color:var(--stamp); background:#fff}
+  .row2{display:flex; gap:10px; margin-top:14px}
+  .row2 .col{flex:1}
+  .primary{width:100%; margin-top:18px; border:none; background:var(--stamp); color:#fff;
+    font-weight:800; font-size:16px; padding:15px; border-radius:13px; letter-spacing:-.01em}
+  .primary:active{transform:translateY(1px)}
+  .primary.sec{background:var(--card); color:var(--stamp); border:1.5px solid var(--stamp)}
+  .primary[disabled]{opacity:.5}
+  .hint{font-size:12.5px; color:var(--muted); text-align:center; margin-top:14px}
+
+  .legend{display:flex; gap:14px; align-items:center; margin:10px 0 16px; font-size:12px; color:var(--muted); flex-wrap:wrap}
+  .legend .dot{display:inline-flex; align-items:center; gap:5px}
+  .swatch{width:16px; height:16px; border-radius:50%; display:inline-block}
+  .sw-good{background:var(--good-soft); border:1.5px solid var(--good)}
+  .sw-open{background:#fff; border:1.5px dashed var(--stamp)}
+  .sw-empty{background:#fff; border:1.5px dashed var(--line)}
+
+  .pcard{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    box-shadow:var(--shadow); padding:14px 15px; margin:0 0 12px}
+  .pcard.me{border:2px solid var(--stamp); background:linear-gradient(#fff,#FCFBFF)}
+  .pcard .phead{display:flex; align-items:center; gap:8px; margin-bottom:12px}
+  .pname{font-weight:800; font-size:16px; letter-spacing:-.02em}
+  .metag{font-size:11px; font-weight:800; color:#fff; background:var(--stamp);
+    padding:2px 8px; border-radius:999px}
+  .count{margin-left:auto; font-size:12.5px; color:var(--muted); font-weight:700}
+  .adm-x{margin-left:8px; border:none; background:var(--warn-soft); color:#B23;
+    font-size:11px; font-weight:800; padding:4px 8px; border-radius:8px}
+
+  .weeks{display:grid; grid-template-columns:repeat(10,1fr); gap:5px}
+  .cell{aspect-ratio:1/1; border-radius:10px; border:1.5px dashed var(--line);
+    background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    position:relative; overflow:hidden; cursor:default}
+  .cell .wn{font-size:10px; font-weight:700; color:var(--muted); position:absolute; top:3px; left:0; right:0; text-align:center}
+  .cell.done{border-style:solid; border-color:var(--good); background:var(--good-soft); cursor:pointer}
+  .cell.done .ck{color:var(--good); font-size:16px; font-weight:900; margin-top:6px}
+  .cell.done .wn{color:#0A7A6B}
+  .cell.done img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+  .cell.done .ovl{position:absolute; inset:0; background:rgba(16,182,160,.14)}
+  .cell.open{border-color:var(--stamp); border-style:dashed; cursor:pointer; background:var(--stamp-soft)}
+  .cell.open .plus{color:var(--stamp); font-size:20px; font-weight:800; margin-top:5px; line-height:1}
+  .cell.open .wn{color:var(--stamp)}
+  .cell.open.pulse{animation:pulse 1.8s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(109,74,255,0)}50%{box-shadow:0 0 0 4px rgba(109,74,255,.14)}}
+  .cell.future{opacity:.45}
+  .cell.editable-done{cursor:pointer}
+  .cell.editable-done::after{content:"수정"; position:absolute; bottom:2px; left:0; right:0;
+    font-size:8.5px; font-weight:800; color:#0A7A6B; text-align:center}
+
+  .empty-state{text-align:center; color:var(--muted); padding:40px 0; font-size:14px}
+  .section-title{font-size:13px; font-weight:800; color:var(--muted); margin:22px 0 10px; letter-spacing:.02em}
+
+  .prow{display:flex; align-items:center; gap:8px; background:var(--card); border:1px solid var(--line);
+    border-radius:12px; padding:10px 12px; margin-bottom:8px}
+  .prow .pn{font-weight:700; flex:1}
+  .prow .p4{font-size:12px; color:var(--muted)}
+  .mini{border:none; border-radius:9px; padding:7px 11px; font-size:12.5px; font-weight:800}
+  .mini.ok{background:var(--good); color:#fff}
+  .mini.no{background:var(--warn-soft); color:#B23}
+
+  .overlay{position:fixed; inset:0; background:rgba(24,20,45,.55); backdrop-filter:blur(3px);
+    display:none; align-items:center; justify-content:center; z-index:50; padding:18px}
+  .overlay.show{display:flex}
+  .modal{background:var(--card); border-radius:18px; width:100%; max-width:420px; padding:22px;
+    box-shadow:0 20px 60px rgba(30,20,70,.3); max-height:88vh; overflow:auto}
+  .modal h3{margin:0 0 4px; font-size:18px; font-weight:800; letter-spacing:-.02em}
+  .modal p.sub{margin:0 0 16px; color:var(--muted); font-size:13px}
+  .img-view{width:100%; border-radius:12px; display:block; background:#f0eef8}
+  .img-cap{text-align:center; color:var(--muted); font-size:13px; margin-top:10px}
+  .modal-actions{display:flex; gap:10px; margin-top:16px}
+  .modal-actions .primary{margin-top:0}
+  .drop{border:2px dashed var(--line); border-radius:14px; padding:24px; text-align:center;
+    color:var(--muted); font-size:14px; background:#FBFAFE; display:block}
+  .drop.has{border-color:var(--good); color:var(--ink)}
+  .prev{width:100%; border-radius:12px; margin-top:12px; display:none}
+  .busy{display:inline-block; width:15px; height:15px; border:2px solid rgba(255,255,255,.4);
+    border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; vertical-align:-2px; margin-right:7px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:#fff; padding:12px 18px; border-radius:12px; font-size:14px; font-weight:600;
+    opacity:0; transition:.25s; z-index:99; pointer-events:none; max-width:90%}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .center-load{text-align:center; padding:60px 0; color:var(--muted)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">🎨 매주 그림 인증<small id="hdrsub">불러오는 중…</small></div>
+    <button class="ghost-btn" id="whoBtn" style="display:none"></button>
+    <button class="ghost-btn" id="admBtn">관리자</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="banner"></div>
+
+  <section id="loginView">
+    <div class="hero">
+      <div class="mark">🖍️</div>
+      <h1>이번 주 그림, 인증하자</h1>
+      <p>닉네임과 전화번호 뒷 4자리로 들어와. 비밀번호 따로 없어서 안 까먹어!</p>
+    </div>
+    <div class="form-card">
+      <label class="fl" for="nick">닉네임</label>
+      <input class="fld" id="nick" placeholder="채팅방에서 쓰는 닉네임" autocomplete="off" />
+      <div class="row2">
+        <div class="col">
+          <label class="fl" for="p4">전화번호 뒷 4자리 <span>(내 칸 잠금용)</span></label>
+          <input class="fld" id="p4" inputmode="numeric" maxlength="4" placeholder="예: 1234" autocomplete="off" />
+        </div>
+      </div>
+      <button class="primary" id="loginBtn">들어가기</button>
+      <div class="hint">처음이면 등록 요청이 관리자에게 전달돼. 승인되면 인증할 수 있어.</div>
+    </div>
+  </section>
+
+  <section id="boardView" style="display:none">
+    <div class="period" id="periodRow"></div>
+    <div class="legend">
+      <span class="dot"><span class="swatch sw-good"></span>인증 완료</span>
+      <span class="dot"><span class="swatch sw-open"></span>이번 주 (인증 가능)</span>
+      <span class="dot"><span class="swatch sw-empty"></span>미인증</span>
+    </div>
+    <div id="adminPending"></div>
+    <div id="boardList"><div class="center-load">현황 불러오는 중…</div></div>
+  </section>
+</div>
+
+<div class="overlay" id="ov">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
+
+<script>
+/* ==========================================================================
+   1) 여기만 채우면 끝!  Firebase 콘솔 > 프로젝트 설정 > 내 앱(웹) 에서 복사
+   ========================================================================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyDMzNeq_DINevwWXutqrYXpaBy6dp9Yuos",
+  authDomain: "shulook-6de61.firebaseapp.com",
+  projectId: "shulook-6de61",
+  storageBucket: "shulook-6de61.firebasestorage.app",
+  messagingSenderId: "876002839235",
+  appId: "1:876002839235:web:7949a0b2fad6da865d3076",
+  measurementId: "G-78N3XQ5Z6E"
+};
+
+/* 관리자 비밀번호 (원하면 바꿔도 됨) */
+const ADMIN_PASSWORD = "1234";
+
+/* 인증 일정: 매주 화 06:00 ~ 다음 월 18:00 (한국시간), 7/7(화) 시작, 10주 */
+const TOTAL_WEEKS = 10;
+const KST = 9 * 60 * 60 * 1000;
+const WEEK1_START = Date.UTC(2026, 6, 7, 6, 0, 0) - KST;  // 2026-07-07 06:00 KST
+const WEEK_MS  = 7 * 24 * 60 * 60 * 1000;
+const OPEN_MS  = (6 * 24 + 12) * 60 * 60 * 1000;           // 화06:00 → 월18:00 = 156시간
+const MAX_IMG_EDGE = 1280;
+const JPEG_QUALITY = 0.75;
+/* ========================================================================== */
+
+
+let db, storage, auth, ready = false;
+let me = null;
+let isAdmin = false;
+let people = [];
+let unsub = null;
+
+function banner(msg){
+  const b = document.getElementById('banner');
+  if(!msg){ b.classList.remove('show'); return; }
+  b.textContent = msg; b.classList.add('show');
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+(async function init(){
+  if(firebaseConfig.apiKey.includes("여기에")){
+    banner("⚠️ 아직 Firebase 설정이 안 됐어. 설명서(README) 보고 index.html 위쪽 firebaseConfig 6줄을 채워줘.");
+    document.getElementById('hdrsub').textContent = "설정 필요";
+    return;
+  }
+  try{
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    storage = firebase.storage();
+    auth = firebase.auth();
+    await auth.signInAnonymously();
+    ready = true;
+    startListening();
+    restoreSession();
+  }catch(e){
+    console.error(e);
+    banner("연결에 실패했어. 익명 로그인(Authentication > 익명)이 켜져 있는지, 설정값이 맞는지 확인해줘.");
+  }
+})();
+
+function startListening(){
+  if(unsub) unsub();
+  unsub = db.collection('participants').onSnapshot(snap=>{
+    people = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    render();
+  }, err=>{
+    console.error(err);
+    banner("데이터를 못 읽었어. Firestore 보안 규칙이 설명서대로 들어갔는지 확인해줘.");
+  });
+}
+
+function weekStart(k){ return WEEK1_START + (k-1)*WEEK_MS; }
+function weekEnd(k){ return weekStart(k) + OPEN_MS; }
+function weekState(k, now){
+  if(now < weekStart(k)) return 'future';
+  if(now < weekEnd(k))   return 'open';
+  return 'locked';
+}
+function currentOpenWeek(now){
+  for(let k=1;k<=TOTAL_WEEKS;k++) if(weekState(k,now)==='open') return k;
+  return null;
+}
+function fmt(ms){
+  const d = new Date(ms + KST);
+  const mm = d.getUTCMonth()+1, dd = d.getUTCDate();
+  const hh = String(d.getUTCHours()).padStart(2,'0');
+  const wd = ['일','월','화','수','목','금','토'][d.getUTCDay()];
+  return `${mm}/${dd}(${wd}) ${hh}:00`;
+}
+
+function render(){
+  const now = Date.now();
+  renderPeriod(now);
+  if(!me){ showLogin(); return; }
+  const fresh = people.find(p=>p.id===me.id);
+  if(fresh){ me = {...me, ...fresh}; }
+  document.getElementById('loginView').style.display='none';
+  document.getElementById('boardView').style.display='block';
+  updateWhoBtn();
+  renderAdminPending(now);
+  renderBoard(now);
+}
+
+function renderPeriod(now){
+  const row = document.getElementById('periodRow');
+  const sub = document.getElementById('hdrsub');
+  const open = currentOpenWeek(now);
+  let html = '';
+  if(now < weekStart(1)){
+    html = `<span class="pill gray">아직 시작 전</span><span class="pill">1주차 오픈: ${fmt(weekStart(1))}</span>`;
+    sub.textContent = '곧 시작해요';
+  } else if(open){
+    html = `<span class="pill">🖍️ ${open}주차 진행 중</span><span class="pill gray">마감: ${fmt(weekEnd(open))}</span>`;
+    sub.textContent = `${open}주차 · 마감 ${fmt(weekEnd(open))}`;
+  } else if(now >= weekEnd(TOTAL_WEEKS)){
+    html = `<span class="pill done">🎉 10주 이벤트 종료</span>`;
+    sub.textContent = '종료됨 (그림은 계속 볼 수 있어요)';
+  } else {
+    let next = 1; for(let k=1;k<=TOTAL_WEEKS;k++){ if(now < weekStart(k)){ next=k; break; } }
+    html = `<span class="pill gray">잠깐 쉬는 중</span><span class="pill">${next}주차 오픈: ${fmt(weekStart(next))}</span>`;
+    sub.textContent = `${next}주차 오픈 대기`;
+  }
+  row.innerHTML = html;
+}
+
+function showLogin(){
+  document.getElementById('loginView').style.display='block';
+  document.getElementById('boardView').style.display='none';
+  document.getElementById('whoBtn').style.display='none';
+}
+function updateWhoBtn(){
+  const b = document.getElementById('whoBtn');
+  b.style.display='inline-block';
+  b.textContent = `${me.nickname} ⏻`;
+  b.onclick = logout;
+}
+
+function approvedSorted(){
+  const list = people.filter(p=>p.status==='approved');
+  list.sort((a,b)=>((a.createdAt?.seconds||0)-(b.createdAt?.seconds||0)));
+  if(me){
+    const i = list.findIndex(p=>p.id===me.id);
+    if(i>0){ const [x]=list.splice(i,1); list.unshift(x); }
+  }
+  return list;
+}
+
+function renderBoard(now){
+  const box = document.getElementById('boardList');
+  const list = approvedSorted();
+  if(!list.length){
+    box.innerHTML = `<div class="empty-state">아직 승인된 참가자가 없어.<br>첫 인증자가 되어보자! 🎨</div>`;
+    return;
+  }
+  box.innerHTML = list.map(p=>{
+    const mine = me && p.id===me.id;
+    const weeks = p.weeks || {};
+    const doneCount = Object.keys(weeks).length;
+    let cells = '';
+    for(let k=1;k<=TOTAL_WEEKS;k++){
+      const st = weekState(k, now);
+      const cert = weeks[String(k)];
+      if(cert){
+        const editable = mine && st==='open';
+        cells += `<div class="cell done ${editable?'editable-done':''}"
+                       data-act="${editable?'edit':'view'}" data-pid="${p.id}" data-week="${k}">
+                    <span class="wn">${k}주</span><span class="ck">✓</span></div>`;
+      } else if(mine && st==='open'){
+        cells += `<div class="cell open pulse" data-act="upload" data-pid="${p.id}" data-week="${k}">
+                    <span class="wn">${k}주</span><span class="plus">+</span></div>`;
+      } else if(isAdmin && st!=='future'){
+        cells += `<div class="cell open" data-act="upload" data-pid="${p.id}" data-week="${k}">
+                    <span class="wn">${k}주</span><span class="plus">+</span></div>`;
+      } else {
+        cells += `<div class="cell ${st==='future'?'future':''}"><span class="wn">${k}주</span></div>`;
+      }
+    }
+    const admX = isAdmin ? `<button class="adm-x" data-act="delp" data-pid="${p.id}">참가자삭제</button>` : '';
+    return `<div class="pcard ${mine?'me':''}">
+      <div class="phead">
+        <span class="pname">${esc(p.nickname)}</span>
+        ${mine?'<span class="metag">나</span>':''}
+        <span class="count">${doneCount}/${TOTAL_WEEKS}주 인증</span>
+        ${admX}
+      </div>
+      <div class="weeks">${cells}</div>
+    </div>`;
+  }).join('');
+
+  box.querySelectorAll('.cell[data-act]').forEach(c=>{
+    c.onclick = ()=>{
+      const act=c.dataset.act, pid=c.dataset.pid, wk=+c.dataset.week;
+      if(act==='view') openImage(pid,wk);
+      else if(act==='upload'||act==='edit') openUpload(pid,wk);
+    };
+  });
+  box.querySelectorAll('[data-act="delp"]').forEach(b=>{
+    b.onclick = ()=> deleteParticipant(b.dataset.pid);
+  });
+}
+
+function renderAdminPending(now){
+  const box = document.getElementById('adminPending');
+  if(!isAdmin){ box.innerHTML=''; return; }
+  const pend = people.filter(p=>p.status==='pending')
+                     .sort((a,b)=>(a.createdAt?.seconds||0)-(b.createdAt?.seconds||0));
+  if(!pend.length){ box.innerHTML = `<div class="section-title">승인 대기 (0)</div>`; return; }
+  box.innerHTML = `<div class="section-title">승인 대기 (${pend.length})</div>` + pend.map(p=>`
+    <div class="prow">
+      <span class="pn">${esc(p.nickname)}</span>
+      <span class="p4">···${esc(p.last4||'')}</span>
+      <button class="mini ok" data-ok="${p.id}">승인</button>
+      <button class="mini no" data-no="${p.id}">거절</button>
+    </div>`).join('');
+  box.querySelectorAll('[data-ok]').forEach(b=> b.onclick=()=>setStatus(b.dataset.ok,'approved'));
+  box.querySelectorAll('[data-no]').forEach(b=> b.onclick=()=>setStatus(b.dataset.no,'rejected'));
+}
+
+document.getElementById('loginBtn').onclick = login;
+document.getElementById('p4').addEventListener('keydown', e=>{ if(e.key==='Enter') login(); });
+
+async function login(){
+  if(!ready){ toast('연결 중이야, 잠깐만!'); return; }
+  const nickname = document.getElementById('nick').value.trim();
+  const last4 = document.getElementById('p4').value.trim();
+  if(!nickname){ toast('닉네임을 입력해줘'); return; }
+  if(!/^\d{4}$/.test(last4)){ toast('전화번호 뒷 4자리(숫자)를 정확히 입력해줘'); return; }
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent='확인 중…';
+  try{
+    const q = await db.collection('participants').where('nickname','==',nickname).limit(1).get();
+    if(q.empty){
+      btn.disabled=false; btn.textContent='들어가기';
+      askRegister(nickname, last4); return;
+    }
+    const doc = q.docs[0]; const p = doc.data();
+    if((p.last4||'') !== last4){ toast('전화번호 뒷자리가 안 맞아 🥲'); btn.disabled=false; btn.textContent='들어가기'; return; }
+    if(p.status==='pending'){ toast('아직 승인 대기 중이야. 관리자 승인 후 인증할 수 있어!'); btn.disabled=false; btn.textContent='들어가기'; return; }
+    if(p.status==='rejected'){ toast('등록이 거절된 닉네임이야. 관리자에게 문의해줘.'); btn.disabled=false; btn.textContent='들어가기'; return; }
+    me = { id:doc.id, nickname:p.nickname, last4 };
+    sessionStorage.setItem('me', JSON.stringify(me));
+    btn.disabled=false; btn.textContent='들어가기';
+    render(); toast(`${p.nickname}, 어서와!`);
+  }catch(e){
+    console.error(e); toast('오류가 났어. 잠시 후 다시 시도해줘.');
+    btn.disabled=false; btn.textContent='들어가기';
+  }
+}
+
+function askRegister(nickname, last4){
+  const box = document.getElementById('modalBox');
+  box.innerHTML = `
+    <h3>처음이구나! 등록할까?</h3>
+    <p class="sub">"<b>${esc(nickname)}</b>" 닉네임으로 참가 신청을 보낼게.<br>관리자가 승인하면 인증할 수 있어.</p>
+    <div class="modal-actions">
+      <button class="primary sec" id="rgCancel">취소</button>
+      <button class="primary" id="rgOk">등록 요청</button>
+    </div>`;
+  showOverlay();
+  document.getElementById('rgCancel').onclick = hideOverlay;
+  document.getElementById('rgOk').onclick = async ()=>{
+    const b=document.getElementById('rgOk'); b.disabled=true; b.innerHTML='<span class="busy"></span>요청 중';
+    try{
+      const dup = await db.collection('participants').where('nickname','==',nickname).limit(1).get();
+      if(!dup.empty){ toast('방금 같은 닉네임이 등록됐어. 다시 들어가기를 눌러줘.'); hideOverlay(); return; }
+      await db.collection('participants').add({
+        nickname, last4, status:'pending', weeks:{},
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      hideOverlay(); toast('신청 완료! 관리자 승인을 기다려줘 🙌');
+    }catch(e){ console.error(e); toast('등록 실패. 다시 시도해줘.'); b.disabled=false; b.textContent='등록 요청'; }
+  };
+}
+
+function logout(){
+  me=null; sessionStorage.removeItem('me');
+  document.getElementById('nick').value=''; document.getElementById('p4').value='';
+  render(); toast('로그아웃 했어');
+}
+function restoreSession(){
+  const s = sessionStorage.getItem('me');
+  if(s){ try{ me = JSON.parse(s); }catch(e){} }
+  render();
+}
+
+let pendingBlob = null;
+function openUpload(pid, week){
+  const box = document.getElementById('modalBox');
+  const p = people.find(x=>x.id===pid);
+  const has = p && p.weeks && p.weeks[String(week)];
+  box.innerHTML = `
+    <h3>${week}주차 ${has?'그림 수정':'그림 인증'}</h3>
+    <p class="sub">${esc(p.nickname)} · 사진을 고르고 인증 버튼을 눌러줘. 자동으로 압축해서 올려.</p>
+    <label class="drop" id="drop">
+      <input type="file" accept="image/*" id="file" style="display:none" />
+      📷 사진 선택하기
+    </label>
+    <img class="prev" id="prev" />
+    <div class="modal-actions">
+      <button class="primary sec" id="upCancel">취소</button>
+      <button class="primary" id="upOk" disabled>인증하기</button>
+    </div>`;
+  showOverlay();
+  pendingBlob = null;
+  const fileEl = document.getElementById('file');
+  const drop = document.getElementById('drop');
+  const prev = document.getElementById('prev');
+  const okB = document.getElementById('upOk');
+  drop.onclick = (e)=>{ if(e.target!==fileEl) fileEl.click(); };
+  fileEl.onchange = async ()=>{
+    const f = fileEl.files[0]; if(!f) return;
+    drop.textContent='압축 중…';
+    try{
+      pendingBlob = await compress(f);
+      prev.src = URL.createObjectURL(pendingBlob); prev.style.display='block';
+      drop.textContent='✅ 사진 준비됨 (다시 누르면 변경)'; drop.classList.add('has');
+      okB.disabled=false;
+    }catch(e){ console.error(e); toast('이미지를 못 읽었어. 다른 파일로 해볼래?'); drop.textContent='📷 사진 선택하기'; }
+  };
+  document.getElementById('upCancel').onclick = hideOverlay;
+  okB.onclick = ()=> doUpload(pid, week, okB);
+}
+
+async function doUpload(pid, week, btn){
+  if(!pendingBlob){ toast('사진을 먼저 골라줘'); return; }
+  btn.disabled=true; btn.innerHTML='<span class="busy"></span>올리는 중';
+  try{
+    const p = people.find(x=>x.id===pid);
+    const oldPath = p?.weeks?.[String(week)]?.path;
+    const path = `certs/${pid}/w${week}_${Date.now()}.jpg`;
+    const refS = storage.ref(path);
+    await refS.put(pendingBlob, {contentType:'image/jpeg'});
+    const url = await refS.getDownloadURL();
+    await db.collection('participants').doc(pid).update({
+      [`weeks.${week}`]: { url, path, updatedAt: Date.now() }
+    });
+    if(oldPath && oldPath!==path){ storage.ref(oldPath).delete().catch(()=>{}); }
+    hideOverlay(); toast(`${week}주차 인증 완료! 🎉`);
+  }catch(e){
+    console.error(e); toast('업로드 실패. Storage 규칙/용량을 확인해줘.');
+    btn.disabled=false; btn.textContent='인증하기';
+  }
+}
+
+function openImage(pid, week){
+  const p = people.find(x=>x.id===pid);
+  const cert = p?.weeks?.[String(week)];
+  if(!cert) return;
+  const canEdit = isAdmin || (me && me.id===pid && weekState(week,Date.now())==='open');
+  const box = document.getElementById('modalBox');
+  box.innerHTML = `
+    <h3>${esc(p.nickname)} · ${week}주차</h3>
+    <p class="sub">인증한 그림</p>
+    <img class="img-view" src="${cert.url}" alt="${week}주차 인증" />
+    <div class="img-cap">${new Date(cert.updatedAt||Date.now()).toLocaleString('ko-KR')}</div>
+    <div class="modal-actions">
+      <button class="primary sec" id="ivClose">닫기</button>
+      ${canEdit?`<button class="primary" id="ivEdit">수정</button>`:''}
+      ${isAdmin?`<button class="primary" id="ivDel" style="background:var(--warn)">삭제</button>`:''}
+    </div>`;
+  showOverlay();
+  document.getElementById('ivClose').onclick = hideOverlay;
+  const e = document.getElementById('ivEdit'); if(e) e.onclick=()=>openUpload(pid,week);
+  const d = document.getElementById('ivDel'); if(d) d.onclick=()=>deleteCert(pid,week);
+}
+
+async function deleteCert(pid, week){
+  if(!confirm(`${week}주차 인증을 삭제할까?`)) return;
+  try{
+    const p = people.find(x=>x.id===pid);
+    const path = p?.weeks?.[String(week)]?.path;
+    await db.collection('participants').doc(pid).update({
+      [`weeks.${week}`]: firebase.firestore.FieldValue.delete()
+    });
+    if(path) storage.ref(path).delete().catch(()=>{});
+    hideOverlay(); toast('삭제했어');
+  }catch(e){ console.error(e); toast('삭제 실패'); }
+}
+
+document.getElementById('admBtn').onclick = ()=>{
+  const b=document.getElementById('admBtn');
+  if(isAdmin){ isAdmin=false; b.classList.remove('on'); b.textContent='관리자'; render(); toast('관리자 모드 해제'); return; }
+  const pw = prompt('관리자 비밀번호');
+  if(pw===null) return;
+  if(pw===ADMIN_PASSWORD){ isAdmin=true; b.classList.add('on'); b.textContent='관리자 ✓'; render(); toast('관리자 모드 ON'); }
+  else toast('비밀번호가 틀렸어');
+};
+
+async function setStatus(pid, status){
+  try{ await db.collection('participants').doc(pid).update({status});
+    toast(status==='approved'?'승인했어 ✅':'거절했어'); }
+  catch(e){ console.error(e); toast('처리 실패'); }
+}
+async function deleteParticipant(pid){
+  const p = people.find(x=>x.id===pid);
+  if(!confirm(`"${p?.nickname}" 참가자와 모든 인증을 삭제할까?`)) return;
+  try{
+    if(p?.weeks) for(const k in p.weeks){ if(p.weeks[k].path) storage.ref(p.weeks[k].path).delete().catch(()=>{}); }
+    await db.collection('participants').doc(pid).delete();
+    if(me && me.id===pid) logout();
+    toast('삭제 완료');
+  }catch(e){ console.error(e); toast('삭제 실패'); }
+}
+
+async function compress(file){
+  let bitmap;
+  try{ bitmap = await createImageBitmap(file, {imageOrientation:'from-image'}); }
+  catch(_){
+    const url = URL.createObjectURL(file);
+    bitmap = await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=url; });
+  }
+  let w = bitmap.width, h = bitmap.height;
+  const scale = Math.min(1, MAX_IMG_EDGE / Math.max(w,h));
+  w = Math.round(w*scale); h = Math.round(h*scale);
+  const c = document.createElement('canvas'); c.width=w; c.height=h;
+  c.getContext('2d').drawImage(bitmap, 0, 0, w, h);
+  return await new Promise(res=> c.toBlob(res, 'image/jpeg', JPEG_QUALITY));
+}
+function esc(s){ return String(s??'').replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+function showOverlay(){ document.getElementById('ov').classList.add('show'); }
+function hideOverlay(){ document.getElementById('ov').classList.remove('show'); pendingBlob=null; }
+document.getElementById('ov').addEventListener('click', e=>{ if(e.target.id==='ov') hideOverlay(); });
+
+setInterval(render, 60*1000); // 1분마다 주차 상태 갱신(마감 자동 잠금)
+</script>
+</body>
+</html>
