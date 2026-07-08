@@ -10,10 +10,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet" />
 <style>
   :root{
-    --paper:#F2F8F3; --card:#FFFFFF; --ink:#1E2A22; --muted:#7C8C7E;
-    --line:#DCEAE0; --stamp:#2F9E52; --stamp-soft:#E4F6EA;
-    --good:#10B6A0; --good-soft:#E1F7F3; --warn:#FF6B6B; --warn-soft:#FFECEC;
-    --shadow:0 2px 10px rgba(30,70,45,.06), 0 8px 30px rgba(30,70,45,.05);
+    --paper:#ECEFE5; --card:#FFFFFF; --cream:#F8F9F3; --ink:#13261C; --muted:#77857A;
+    --line:#E4E7DC; --stamp:#00331A; --stamp-soft:#E6ECE4;
+    --good:#2E7D52; --good-soft:#E4EFE7; --warn:#B4442E; --warn-soft:#F5E6E1;
+    --shadow:0 2px 10px rgba(0,45,25,.05), 0 12px 34px rgba(0,45,25,.07);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0}
@@ -27,17 +27,17 @@
   button{font-family:inherit; cursor:pointer}
 
   header.top{
-    position:sticky; top:0; z-index:20; background:rgba(242,248,243,.86);
-    backdrop-filter:saturate(160%) blur(10px); border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:20; background:var(--stamp);
+    border-bottom:1px solid rgba(0,0,0,0);
   }
-  .top-inner{max-width:640px; margin:0 auto; padding:12px 16px; display:flex; align-items:center; gap:10px}
-  .brand{font-weight:800; font-size:19px; letter-spacing:-.02em; flex:1}
-  .brand small{display:block; font-weight:600; font-size:12px; color:var(--muted); letter-spacing:0}
+  .top-inner{max-width:640px; margin:0 auto; padding:13px 16px; display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+  .brand{font-weight:800; font-size:19px; letter-spacing:-.02em; flex:1; color:var(--cream)}
+  .brand small{display:block; font-weight:600; font-size:12px; color:rgba(248,249,243,.6); letter-spacing:0}
   .ghost-btn{
-    border:1px solid var(--line); background:var(--card); color:var(--muted);
+    border:1px solid rgba(248,249,243,.28); background:transparent; color:rgba(248,249,243,.92);
     border-radius:10px; padding:8px 10px; font-size:13px; font-weight:600;
   }
-  .ghost-btn.on{color:var(--stamp); border-color:var(--stamp); background:var(--stamp-soft)}
+  .ghost-btn.on{color:var(--stamp); border-color:var(--cream); background:var(--cream)}
 
   #banner{display:none; margin:14px 0 0; padding:12px 14px; border-radius:12px;
     font-size:13px; font-weight:600; background:var(--warn-soft); color:#B23}
@@ -46,8 +46,8 @@
   .period{margin:16px 0 4px; display:flex; align-items:center; gap:8px; flex-wrap:wrap}
   .pill{font-size:12.5px; font-weight:700; padding:6px 11px; border-radius:999px;
     background:var(--stamp-soft); color:var(--stamp)}
-  .pill.gray{background:#EEEDF4; color:var(--muted)}
-  .pill.done{background:var(--good-soft); color:#0A7A6B}
+  .pill.gray{background:#E4E7DC; color:var(--muted)}
+  .pill.done{background:var(--good-soft); color:#1E5E3C}
 
   .hero{padding:34px 0 8px; text-align:center}
   .hero .mark{line-height:1}
@@ -60,11 +60,11 @@
   label.fl{display:block; font-size:13px; font-weight:700; margin:0 0 6px; color:var(--ink)}
   label.fl span{color:var(--muted); font-weight:500}
   .fld{width:100%; border:1px solid var(--line); border-radius:12px; padding:13px 14px;
-    font-size:16px; font-family:inherit; background:#F7FBF8; color:var(--ink); outline:none}
+    font-size:16px; font-family:inherit; background:#F4F6EE; color:var(--ink); outline:none}
   .fld:focus{border-color:var(--stamp); background:#fff}
   .row2{display:flex; gap:10px; margin-top:14px}
   .row2 .col{flex:1}
-  .primary{width:100%; margin-top:18px; border:none; background:var(--stamp); color:#fff;
+  .primary{width:100%; margin-top:18px; border:none; background:var(--stamp); color:var(--cream);
     font-weight:800; font-size:16px; padding:15px; border-radius:13px; letter-spacing:-.01em}
   .primary:active{transform:translateY(1px)}
   .primary.sec{background:var(--card); color:var(--stamp); border:1.5px solid var(--stamp)}
@@ -80,10 +80,10 @@
 
   .pcard{background:var(--card); border:1px solid var(--line); border-radius:16px;
     box-shadow:var(--shadow); padding:14px 15px; margin:0 0 12px}
-  .pcard.me{border:2px solid var(--stamp); background:linear-gradient(#fff,#FAFDFB)}
+  .pcard.me{border:2px solid var(--stamp); background:linear-gradient(#fff,#F6F9F4)}
   .pcard .phead{display:flex; align-items:center; gap:6px; margin-bottom:12px; flex-wrap:wrap}
   .pname{font-weight:800; font-size:16px; letter-spacing:-.02em}
-  .metag{font-size:11px; font-weight:800; color:#fff; background:var(--stamp);
+  .metag{font-size:11px; font-weight:800; color:var(--cream); background:var(--stamp);
     padding:2px 8px; border-radius:999px}
   .count{margin-left:auto; font-size:12.5px; color:var(--muted); font-weight:700}
   .p4tag{font-size:11.5px; color:var(--muted); font-weight:700}
@@ -102,18 +102,18 @@
   .cell .wn{font-size:13px; font-weight:700; color:var(--muted); position:absolute; top:6px; left:0; right:0; text-align:center}
   .cell.done{border-style:solid; border-color:var(--good); background:var(--good-soft); cursor:pointer}
   .cell.done .ck{color:var(--good); font-size:26px; font-weight:900; margin-top:9px}
-  .cell.done .wn{color:#0A7A6B}
+  .cell.done .wn{color:#1E5E3C}
   .cell.done img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
-  .cell.done .ovl{position:absolute; inset:0; background:rgba(16,182,160,.14)}
+  .cell.done .ovl{position:absolute; inset:0; background:rgba(46,125,82,.14)}
   .cell.open{border-color:var(--stamp); border-style:dashed; cursor:pointer; background:var(--stamp-soft)}
   .cell.open .plus{color:var(--stamp); font-size:30px; font-weight:800; margin-top:8px; line-height:1}
   .cell.open .wn{color:var(--stamp)}
   .cell.open.pulse{animation:pulse 1.8s ease-in-out infinite}
-  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(47,158,82,0)}50%{box-shadow:0 0 0 4px rgba(47,158,82,.18)}}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,51,26,0)}50%{box-shadow:0 0 0 4px rgba(0,51,26,.16)}}
   .cell.future{opacity:.45}
   .cell.editable-done{cursor:pointer}
   .cell.editable-done::after{content:"수정"; position:absolute; bottom:5px; left:0; right:0;
-    font-size:11px; font-weight:800; color:#0A7A6B; text-align:center}
+    font-size:11px; font-weight:800; color:#1E5E3C; text-align:center}
 
   .empty-state{text-align:center; color:var(--muted); padding:40px 0; font-size:14px}
   .section-title{font-size:13px; font-weight:800; color:var(--muted); margin:22px 0 10px; letter-spacing:.02em}
@@ -123,7 +123,7 @@
   .prow .pn{font-weight:700; flex:1}
   .prow .p4{font-size:12px; color:var(--muted)}
   .mini{border:none; border-radius:9px; padding:7px 11px; font-size:12.5px; font-weight:800}
-  .mini.ok{background:var(--good); color:#fff}
+  .mini.ok{background:var(--good); color:var(--cream)}
   .mini.no{background:var(--warn-soft); color:#B23}
 
   .overlay{position:fixed; inset:0; background:rgba(18,32,22,.55); backdrop-filter:blur(3px);
@@ -133,13 +133,13 @@
     box-shadow:0 20px 60px rgba(18,50,30,.3); max-height:88vh; overflow:auto}
   .modal h3{margin:0 0 4px; font-size:18px; font-weight:800; letter-spacing:-.02em}
   .modal p.sub{margin:0 0 16px; color:var(--muted); font-size:13px}
-  .img-view{width:100%; border-radius:12px; display:block; background:#eef5f0}
+  .img-view{width:100%; border-radius:12px; display:block; background:#EDEFE6}
   .img-cap{text-align:center; color:var(--muted); font-size:13px; margin-top:10px}
   .modal-actions{display:flex; gap:10px; margin-top:16px}
   .modal-actions .primary{margin-top:0}
   .admpw-fld{letter-spacing:.15em}
   .drop{border:2px dashed var(--line); border-radius:14px; padding:24px; text-align:center;
-    color:var(--muted); font-size:14px; background:#F7FBF8; display:block}
+    color:var(--muted); font-size:14px; background:#F4F6EE; display:block}
   .drop.has{border-color:var(--good); color:var(--ink)}
   .prev{width:100%; border-radius:12px; margin-top:12px; display:none}
   .busy{display:inline-block; width:15px; height:15px; border:2px solid rgba(255,255,255,.4);
@@ -153,14 +153,14 @@
   .ver{text-align:center; color:var(--muted); opacity:.6; font-size:11px; font-weight:600;
     letter-spacing:.02em; margin:28px 0 6px}
   .fab{position:fixed; left:50%; bottom:20px; transform:translateX(-50%); z-index:40;
-    border:none; background:var(--stamp); color:#fff; font-weight:800; font-size:15px;
-    padding:14px 28px; border-radius:999px; box-shadow:0 6px 20px rgba(30,70,45,.28)}
+    border:none; background:var(--stamp); color:var(--cream); font-weight:800; font-size:15px;
+    padding:14px 28px; border-radius:999px; box-shadow:0 8px 24px rgba(0,45,25,.32)}
   .fab:active{transform:translateX(-50%) translateY(1px)}
   .stat-row{display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--line)}
   .stat-row:last-of-type{border-bottom:none}
-  .stat-badge{flex:0 0 auto; min-width:44px; text-align:center; background:var(--stamp); color:#fff;
+  .stat-badge{flex:0 0 auto; min-width:44px; text-align:center; background:var(--stamp); color:var(--cream);
     font-weight:800; font-size:13px; padding:5px 8px; border-radius:9px}
-  .stat-badge.zero{background:#EEEDF4; color:var(--muted)}
+  .stat-badge.zero{background:#E4E7DC; color:var(--muted)}
   .stat-names{font-size:14px; line-height:1.55; padding-top:2px}
   .stat-names b{color:var(--stamp)}
 </style>
@@ -249,7 +249,7 @@ const firebaseConfig = {
 const ADMIN_PASSWORD = "1234";
 
 /* 버전 표시 (수정할 때마다 올려주면 배포 반영 확인용) */
-const APP_VERSION = "v2026.07.09d";
+const APP_VERSION = "v2026.07.10 · 에메랄드 테마";
 
 /* 인증 일정: 매주 화 06:00 ~ 다음 월 18:00 (한국시간), 7/7(화) 시작, 10주 */
 const TOTAL_WEEKS = 10;
