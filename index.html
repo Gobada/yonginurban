@@ -7,10 +7,10 @@
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 <style>
   :root{
-    --paper:#F6F5FB; --card:#FFFFFF; --ink:#232238; --muted:#8C8AA6;
-    --line:#E7E4F2; --stamp:#6D4AFF; --stamp-soft:#EFEBFF;
+    --paper:#F2F8F3; --card:#FFFFFF; --ink:#1E2A22; --muted:#7C8C7E;
+    --line:#DCEAE0; --stamp:#2F9E52; --stamp-soft:#E4F6EA;
     --good:#10B6A0; --good-soft:#E1F7F3; --warn:#FF6B6B; --warn-soft:#FFECEC;
-    --shadow:0 2px 10px rgba(60,50,120,.06), 0 8px 30px rgba(60,50,120,.05);
+    --shadow:0 2px 10px rgba(30,70,45,.06), 0 8px 30px rgba(30,70,45,.05);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0}
@@ -24,7 +24,7 @@
   button{font-family:inherit; cursor:pointer}
 
   header.top{
-    position:sticky; top:0; z-index:20; background:rgba(246,245,251,.86);
+    position:sticky; top:0; z-index:20; background:rgba(242,248,243,.86);
     backdrop-filter:saturate(160%) blur(10px); border-bottom:1px solid var(--line);
   }
   .top-inner{max-width:640px; margin:0 auto; padding:12px 16px; display:flex; align-items:center; gap:10px}
@@ -47,7 +47,9 @@
   .pill.done{background:var(--good-soft); color:#0A7A6B}
 
   .hero{padding:34px 0 8px; text-align:center}
-  .hero .mark{font-size:44px; line-height:1}
+  .hero .mark{line-height:1}
+  .stamp-mark{display:flex; justify-content:center}
+  .stamp-mark svg{width:86px; height:86px; color:var(--stamp)}
   .hero h1{font-size:26px; font-weight:800; letter-spacing:-.03em; margin:14px 0 6px}
   .hero p{color:var(--muted); font-size:14px; margin:0 auto; max-width:340px}
   .form-card{background:var(--card); border:1px solid var(--line); border-radius:18px;
@@ -55,7 +57,7 @@
   label.fl{display:block; font-size:13px; font-weight:700; margin:0 0 6px; color:var(--ink)}
   label.fl span{color:var(--muted); font-weight:500}
   .fld{width:100%; border:1px solid var(--line); border-radius:12px; padding:13px 14px;
-    font-size:16px; font-family:inherit; background:#FBFAFE; color:var(--ink); outline:none}
+    font-size:16px; font-family:inherit; background:#F7FBF8; color:var(--ink); outline:none}
   .fld:focus{border-color:var(--stamp); background:#fff}
   .row2{display:flex; gap:10px; margin-top:14px}
   .row2 .col{flex:1}
@@ -75,34 +77,38 @@
 
   .pcard{background:var(--card); border:1px solid var(--line); border-radius:16px;
     box-shadow:var(--shadow); padding:14px 15px; margin:0 0 12px}
-  .pcard.me{border:2px solid var(--stamp); background:linear-gradient(#fff,#FCFBFF)}
+  .pcard.me{border:2px solid var(--stamp); background:linear-gradient(#fff,#FAFDFB)}
   .pcard .phead{display:flex; align-items:center; gap:8px; margin-bottom:12px}
   .pname{font-weight:800; font-size:16px; letter-spacing:-.02em}
   .metag{font-size:11px; font-weight:800; color:#fff; background:var(--stamp);
     padding:2px 8px; border-radius:999px}
   .count{margin-left:auto; font-size:12.5px; color:var(--muted); font-weight:700}
+  .p4tag{font-size:11.5px; color:var(--muted); font-weight:700}
+  .adm-edit{margin-left:8px; border:none; background:var(--stamp-soft); color:var(--stamp);
+    font-size:11px; font-weight:800; padding:4px 8px; border-radius:8px}
+  .adm-edit.on{background:var(--stamp); color:#fff}
   .adm-x{margin-left:8px; border:none; background:var(--warn-soft); color:#B23;
     font-size:11px; font-weight:800; padding:4px 8px; border-radius:8px}
 
-  .weeks{display:grid; grid-template-columns:repeat(10,1fr); gap:5px}
-  .cell{aspect-ratio:1/1; border-radius:10px; border:1.5px dashed var(--line);
+  .weeks{display:grid; grid-template-columns:repeat(5,1fr); gap:9px}
+  .cell{aspect-ratio:1/1; border-radius:14px; border:2px dashed var(--line);
     background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center;
     position:relative; overflow:hidden; cursor:default}
-  .cell .wn{font-size:10px; font-weight:700; color:var(--muted); position:absolute; top:3px; left:0; right:0; text-align:center}
+  .cell .wn{font-size:13px; font-weight:700; color:var(--muted); position:absolute; top:6px; left:0; right:0; text-align:center}
   .cell.done{border-style:solid; border-color:var(--good); background:var(--good-soft); cursor:pointer}
-  .cell.done .ck{color:var(--good); font-size:16px; font-weight:900; margin-top:6px}
+  .cell.done .ck{color:var(--good); font-size:26px; font-weight:900; margin-top:9px}
   .cell.done .wn{color:#0A7A6B}
   .cell.done img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
   .cell.done .ovl{position:absolute; inset:0; background:rgba(16,182,160,.14)}
   .cell.open{border-color:var(--stamp); border-style:dashed; cursor:pointer; background:var(--stamp-soft)}
-  .cell.open .plus{color:var(--stamp); font-size:20px; font-weight:800; margin-top:5px; line-height:1}
+  .cell.open .plus{color:var(--stamp); font-size:30px; font-weight:800; margin-top:8px; line-height:1}
   .cell.open .wn{color:var(--stamp)}
   .cell.open.pulse{animation:pulse 1.8s ease-in-out infinite}
-  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(109,74,255,0)}50%{box-shadow:0 0 0 4px rgba(109,74,255,.14)}}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(47,158,82,0)}50%{box-shadow:0 0 0 4px rgba(47,158,82,.18)}}
   .cell.future{opacity:.45}
   .cell.editable-done{cursor:pointer}
-  .cell.editable-done::after{content:"수정"; position:absolute; bottom:2px; left:0; right:0;
-    font-size:8.5px; font-weight:800; color:#0A7A6B; text-align:center}
+  .cell.editable-done::after{content:"수정"; position:absolute; bottom:5px; left:0; right:0;
+    font-size:11px; font-weight:800; color:#0A7A6B; text-align:center}
 
   .empty-state{text-align:center; color:var(--muted); padding:40px 0; font-size:14px}
   .section-title{font-size:13px; font-weight:800; color:var(--muted); margin:22px 0 10px; letter-spacing:.02em}
@@ -115,19 +121,19 @@
   .mini.ok{background:var(--good); color:#fff}
   .mini.no{background:var(--warn-soft); color:#B23}
 
-  .overlay{position:fixed; inset:0; background:rgba(24,20,45,.55); backdrop-filter:blur(3px);
+  .overlay{position:fixed; inset:0; background:rgba(18,32,22,.55); backdrop-filter:blur(3px);
     display:none; align-items:center; justify-content:center; z-index:50; padding:18px}
   .overlay.show{display:flex}
   .modal{background:var(--card); border-radius:18px; width:100%; max-width:420px; padding:22px;
-    box-shadow:0 20px 60px rgba(30,20,70,.3); max-height:88vh; overflow:auto}
+    box-shadow:0 20px 60px rgba(18,50,30,.3); max-height:88vh; overflow:auto}
   .modal h3{margin:0 0 4px; font-size:18px; font-weight:800; letter-spacing:-.02em}
   .modal p.sub{margin:0 0 16px; color:var(--muted); font-size:13px}
-  .img-view{width:100%; border-radius:12px; display:block; background:#f0eef8}
+  .img-view{width:100%; border-radius:12px; display:block; background:#eef5f0}
   .img-cap{text-align:center; color:var(--muted); font-size:13px; margin-top:10px}
   .modal-actions{display:flex; gap:10px; margin-top:16px}
   .modal-actions .primary{margin-top:0}
   .drop{border:2px dashed var(--line); border-radius:14px; padding:24px; text-align:center;
-    color:var(--muted); font-size:14px; background:#FBFAFE; display:block}
+    color:var(--muted); font-size:14px; background:#F7FBF8; display:block}
   .drop.has{border-color:var(--good); color:var(--ink)}
   .prev{width:100%; border-radius:12px; margin-top:12px; display:none}
   .busy{display:inline-block; width:15px; height:15px; border:2px solid rgba(255,255,255,.4);
@@ -146,7 +152,8 @@
 
 <header class="top">
   <div class="top-inner">
-    <div class="brand">🎨 매주 그림 인증<small id="hdrsub">불러오는 중…</small></div>
+    <div class="brand">매주 그림 인증<small id="hdrsub">불러오는 중…</small></div>
+    <button class="ghost-btn" id="trashBtn" style="display:none">🗑️ 휴지통</button>
     <button class="ghost-btn" id="whoBtn" style="display:none"></button>
     <button class="ghost-btn" id="admBtn">관리자</button>
   </div>
@@ -157,21 +164,50 @@
 
   <section id="loginView">
     <div class="hero">
-      <div class="mark">🖍️</div>
-      <h1>이번 주 그림, 인증하자</h1>
-      <p>닉네임과 전화번호 뒷 4자리로 들어와. 비밀번호 따로 없어서 안 까먹어!</p>
+      <div class="mark stamp-mark" aria-hidden="true">
+        <svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+          <g transform="rotate(-7 70 74)">
+            <circle cx="70" cy="74" r="60" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="7 4" opacity=".8"/>
+            <circle cx="70" cy="80" r="33" fill="none" stroke="currentColor" stroke-width="3"/>
+            <circle cx="70" cy="80" r="22" fill="none" stroke="currentColor" stroke-width="2" opacity=".75"/>
+            <g stroke="currentColor" stroke-width="2">
+              <line x1="70" y1="80" x2="70" y2="47"/>
+              <line x1="70" y1="80" x2="98" y2="63"/>
+              <line x1="70" y1="80" x2="98" y2="97"/>
+              <line x1="70" y1="80" x2="70" y2="113"/>
+              <line x1="70" y1="80" x2="42" y2="97"/>
+              <line x1="70" y1="80" x2="42" y2="63"/>
+            </g>
+            <g fill="currentColor">
+              <circle cx="70" cy="47" r="6.5"/>
+              <circle cx="98" cy="63" r="6.5"/>
+              <circle cx="98" cy="97" r="6.5"/>
+              <circle cx="70" cy="113" r="6.5"/>
+              <circle cx="42" cy="97" r="6.5"/>
+              <circle cx="42" cy="63" r="6.5"/>
+            </g>
+            <g fill="currentColor" opacity=".8">
+              <path d="M24 26 l2.4 6.2 l6.2 2.4 l-6.2 2.4 l-2.4 6.2 l-2.4 -6.2 l-6.2 -2.4 l6.2 -2.4 z"/>
+              <circle cx="14" cy="42" r="1.8"/>
+              <circle cx="36" cy="18" r="1.4"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <h1>어사출도 출석도장 찍기!</h1>
+      <p>닉네임과 전화번호 뒷 4자리로 들어오세요.</p>
     </div>
     <div class="form-card">
       <label class="fl" for="nick">닉네임</label>
       <input class="fld" id="nick" placeholder="채팅방에서 쓰는 닉네임" autocomplete="off" />
       <div class="row2">
         <div class="col">
-          <label class="fl" for="p4">전화번호 뒷 4자리 <span>(내 칸 잠금용)</span></label>
+          <label class="fl" for="p4">전화번호 뒷 4자리</span></label>
           <input class="fld" id="p4" inputmode="numeric" maxlength="4" placeholder="예: 1234" autocomplete="off" />
         </div>
       </div>
       <button class="primary" id="loginBtn">들어가기</button>
-      <div class="hint">처음이면 등록 요청이 관리자에게 전달돼. 승인되면 인증할 수 있어.</div>
+      <div class="hint">처음이면 등록 요청이 관리자에게 전달돼요. 승인되면 인증할 수 있어요.</div>
     </div>
   </section>
 
@@ -220,7 +256,7 @@ const firebaseConfig = {
 const ADMIN_PASSWORD = "1234";
 
 /* 버전 표시 (수정할 때마다 올려주면 배포 반영 확인용) */
-const APP_VERSION = "v2026.07.08b · 업로드 수정";
+const APP_VERSION = "v2026.07.08d · 관리자 수정모드/휴지통/그린테마";
 
 /* 인증 일정: 매주 화 06:00 ~ 다음 월 18:00 (한국시간), 7/7(화) 시작, 10주 */
 const TOTAL_WEEKS = 10;
@@ -238,6 +274,7 @@ let me = null;
 let isAdmin = false;
 let people = [];
 let unsub = null;
+let adminEditPid = null; // 관리자가 현재 '수정' 모드로 열어둔 참가자 id
 
 function banner(msg){
   const b = document.getElementById('banner');
@@ -253,7 +290,7 @@ function toast(msg){
 (async function init(){
   document.getElementById('verTag').textContent = APP_VERSION;
   if(firebaseConfig.apiKey.includes("여기에")){
-    banner("⚠️ 아직 Firebase 설정이 안 됐어. 설명서(README) 보고 index.html 위쪽 firebaseConfig 6줄을 채워줘.");
+    banner("⚠️ 아직 Firebase 설정이 안 됐어요. 설명서(README) 보고 index.html 위쪽 firebaseConfig 6줄을 채워주세요.");
     document.getElementById('hdrsub').textContent = "설정 필요";
     return;
   }
@@ -268,7 +305,7 @@ function toast(msg){
     restoreSession();
   }catch(e){
     console.error(e);
-    banner("연결에 실패했어. 익명 로그인(Authentication > 익명)이 켜져 있는지, 설정값이 맞는지 확인해줘.");
+    banner("연결에 실패했어요. 익명 로그인(Authentication > 익명)이 켜져 있는지, 설정값이 맞는지 확인해주세요.");
   }
 })();
 
@@ -279,7 +316,7 @@ function startListening(){
     render();
   }, err=>{
     console.error(err);
-    banner("데이터를 못 읽었어. Firestore 보안 규칙이 설명서대로 들어갔는지 확인해줘.");
+    banner("데이터를 못 읽었어요. Firestore 보안 규칙이 설명서대로 들어갔는지 확인해주세요.");
   });
 }
 
@@ -345,6 +382,14 @@ function showLogin(){
   document.getElementById('whoBtn').style.display='none';
 }
 function updateWhoBtn(){
+  const trashBtn = document.getElementById('trashBtn');
+  if(isAdmin){
+    const n = people.filter(p=>p.status==='trashed').length;
+    trashBtn.style.display='inline-block';
+    trashBtn.textContent = n>0 ? `🗑️ 휴지통 (${n})` : '🗑️ 휴지통';
+  } else {
+    trashBtn.style.display='none';
+  }
   const b = document.getElementById('whoBtn');
   if(me){
     b.style.display='inline-block';
@@ -353,7 +398,7 @@ function updateWhoBtn(){
   } else if(isAdmin){
     b.style.display='inline-block';
     b.textContent = '로그인';
-    b.onclick = ()=>{ isAdmin=false; const a=document.getElementById('admBtn'); a.classList.remove('on'); a.textContent='관리자'; render(); };
+    b.onclick = ()=>{ isAdmin=false; adminEditPid=null; const a=document.getElementById('admBtn'); a.classList.remove('on'); a.textContent='관리자'; render(); };
   } else {
     b.style.display='none';
   }
@@ -371,13 +416,16 @@ function approvedSorted(){
 
 function renderBoard(now){
   const box = document.getElementById('boardList');
-  const list = approvedSorted();
+  const list = isAdmin ? approvedSorted() : (me ? people.filter(p=>p.status==='approved' && p.id===me.id) : []);
   if(!list.length){
-    box.innerHTML = `<div class="empty-state">아직 승인된 참가자가 없어.<br>첫 인증자가 되어보자! 🎨</div>`;
+    box.innerHTML = isAdmin
+      ? `<div class="empty-state">아직 승인된 참가자가 없어요.<br>첫 인증자가 되어보세요! 🎨</div>`
+      : `<div class="empty-state">참가자 정보를 찾을 수 없어요.</div>`;
     return;
   }
   box.innerHTML = list.map(p=>{
     const mine = me && p.id===me.id;
+    const editing = isAdmin && adminEditPid===p.id;
     const weeks = p.weeks || {};
     const doneCount = Object.keys(weeks).length;
     let cells = '';
@@ -385,27 +433,32 @@ function renderBoard(now){
       const st = weekState(k, now);
       const cert = weeks[String(k)];
       if(cert){
-        const editable = mine && st==='open';
+        const editable = (mine && st==='open') || editing;
         cells += `<div class="cell done ${editable?'editable-done':''}"
                        data-act="${editable?'edit':'view'}" data-pid="${p.id}" data-week="${k}">
                     <span class="wn">${k}주</span><span class="ck">✓</span></div>`;
       } else if(mine && st==='open'){
         cells += `<div class="cell open pulse" data-act="upload" data-pid="${p.id}" data-week="${k}">
                     <span class="wn">${k}주</span><span class="plus">+</span></div>`;
-      } else if(isAdmin && st!=='future'){
+      } else if(editing && st!=='future'){
         cells += `<div class="cell open" data-act="upload" data-pid="${p.id}" data-week="${k}">
                     <span class="wn">${k}주</span><span class="plus">+</span></div>`;
       } else {
         cells += `<div class="cell ${st==='future'?'future':''}"><span class="wn">${k}주</span></div>`;
       }
     }
-    const admX = isAdmin ? `<button class="adm-x" data-act="delp" data-pid="${p.id}">참가자삭제</button>` : '';
+    const admCtl = isAdmin
+      ? (editing
+          ? `<button class="adm-edit on" data-act="edtoggle" data-pid="${p.id}">완료</button><button class="adm-x" data-act="delp" data-pid="${p.id}">참가자삭제</button>`
+          : `<button class="adm-edit" data-act="edtoggle" data-pid="${p.id}">수정</button>`)
+      : '';
     return `<div class="pcard ${mine?'me':''}">
       <div class="phead">
         <span class="pname">${esc(p.nickname)}</span>
+        ${isAdmin?`<span class="p4tag">···${esc(p.last4||'')}</span>`:''}
         ${mine?'<span class="metag">나</span>':''}
         <span class="count">${doneCount}/${TOTAL_WEEKS}주 인증</span>
-        ${admX}
+        ${admCtl}
       </div>
       <div class="weeks">${cells}</div>
     </div>`;
@@ -416,6 +469,12 @@ function renderBoard(now){
       const act=c.dataset.act, pid=c.dataset.pid, wk=+c.dataset.week;
       if(act==='view') openImage(pid,wk);
       else if(act==='upload'||act==='edit') openUpload(pid,wk);
+    };
+  });
+  box.querySelectorAll('[data-act="edtoggle"]').forEach(b=>{
+    b.onclick = ()=>{
+      adminEditPid = (adminEditPid===b.dataset.pid) ? null : b.dataset.pid;
+      render();
     };
   });
   box.querySelectorAll('[data-act="delp"]').forEach(b=>{
@@ -444,11 +503,11 @@ document.getElementById('loginBtn').onclick = login;
 document.getElementById('p4').addEventListener('keydown', e=>{ if(e.key==='Enter') login(); });
 
 async function login(){
-  if(!ready){ toast('연결 중이야, 잠깐만!'); return; }
+  if(!ready){ toast('연결 중이에요, 잠깐만요!'); return; }
   const nickname = document.getElementById('nick').value.trim();
   const last4 = document.getElementById('p4').value.trim();
-  if(!nickname){ toast('닉네임을 입력해줘'); return; }
-  if(!/^\d{4}$/.test(last4)){ toast('전화번호 뒷 4자리(숫자)를 정확히 입력해줘'); return; }
+  if(!nickname){ toast('닉네임을 입력해주세요'); return; }
+  if(!/^\d{4}$/.test(last4)){ toast('전화번호 뒷 4자리(숫자)를 정확히 입력해주세요'); return; }
 
   const btn = document.getElementById('loginBtn');
   btn.disabled = true; btn.textContent='확인 중…';
@@ -459,15 +518,15 @@ async function login(){
       askRegister(nickname, last4); return;
     }
     const doc = q.docs[0]; const p = doc.data();
-    if((p.last4||'') !== last4){ toast('전화번호 뒷자리가 안 맞아 🥲'); btn.disabled=false; btn.textContent='들어가기'; return; }
-    if(p.status==='pending'){ toast('아직 승인 대기 중이야. 관리자 승인 후 인증할 수 있어!'); btn.disabled=false; btn.textContent='들어가기'; return; }
-    if(p.status==='rejected'){ toast('등록이 거절된 닉네임이야. 관리자에게 문의해줘.'); btn.disabled=false; btn.textContent='들어가기'; return; }
+    if((p.last4||'') !== last4){ toast('전화번호 뒷자리가 안 맞아요 🥲'); btn.disabled=false; btn.textContent='들어가기'; return; }
+    if(p.status==='pending'){ toast('아직 승인 대기 중이에요. 관리자 승인 후 인증할 수 있어요!'); btn.disabled=false; btn.textContent='들어가기'; return; }
+    if(p.status==='rejected'){ toast('등록이 거절된 닉네임이에요. 관리자에게 문의해주세요.'); btn.disabled=false; btn.textContent='들어가기'; return; }
     me = { id:doc.id, nickname:p.nickname, last4 };
     sessionStorage.setItem('me', JSON.stringify(me));
     btn.disabled=false; btn.textContent='들어가기';
-    render(); toast(`${p.nickname}, 어서와!`);
+    render(); toast(`${p.nickname}님, 어서오세요!`);
   }catch(e){
-    console.error(e); toast('오류가 났어. 잠시 후 다시 시도해줘.');
+    console.error(e); toast('오류가 났어요. 잠시 후 다시 시도해주세요.');
     btn.disabled=false; btn.textContent='들어가기';
   }
 }
@@ -475,8 +534,8 @@ async function login(){
 function askRegister(nickname, last4){
   const box = document.getElementById('modalBox');
   box.innerHTML = `
-    <h3>처음이구나! 등록할까?</h3>
-    <p class="sub">"<b>${esc(nickname)}</b>" 닉네임으로 참가 신청을 보낼게.<br>관리자가 승인하면 인증할 수 있어.</p>
+    <h3>처음이시군요! 등록할까요?</h3>
+    <p class="sub">"<b>${esc(nickname)}</b>" 닉네임으로 참가 신청을 보낼게요.<br>관리자가 승인하면 인증할 수 있어요.</p>
     <div class="modal-actions">
       <button class="primary sec" id="rgCancel">취소</button>
       <button class="primary" id="rgOk">등록 요청</button>
@@ -487,20 +546,20 @@ function askRegister(nickname, last4){
     const b=document.getElementById('rgOk'); b.disabled=true; b.innerHTML='<span class="busy"></span>요청 중';
     try{
       const dup = await db.collection('participants').where('nickname','==',nickname).limit(1).get();
-      if(!dup.empty){ toast('방금 같은 닉네임이 등록됐어. 다시 들어가기를 눌러줘.'); hideOverlay(); return; }
+      if(!dup.empty){ toast('방금 같은 닉네임이 등록됐어요. 다시 들어가기를 눌러주세요.'); hideOverlay(); return; }
       await db.collection('participants').add({
         nickname, last4, status:'pending', weeks:{},
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-      hideOverlay(); toast('신청 완료! 관리자 승인을 기다려줘 🙌');
-    }catch(e){ console.error(e); toast('등록 실패. 다시 시도해줘.'); b.disabled=false; b.textContent='등록 요청'; }
+      hideOverlay(); toast('신청 완료! 관리자 승인을 기다려주세요 🙌');
+    }catch(e){ console.error(e); toast('등록 실패. 다시 시도해주세요.'); b.disabled=false; b.textContent='등록 요청'; }
   };
 }
 
 function logout(){
   me=null; sessionStorage.removeItem('me');
   document.getElementById('nick').value=''; document.getElementById('p4').value='';
-  render(); toast('로그아웃 했어');
+  render(); toast('로그아웃 했어요');
 }
 function restoreSession(){
   const s = sessionStorage.getItem('me');
@@ -515,7 +574,7 @@ function openUpload(pid, week){
   const has = p && p.weeks && p.weeks[String(week)];
   box.innerHTML = `
     <h3>${week}주차 ${has?'그림 수정':'그림 인증'}</h3>
-    <p class="sub">${esc(p.nickname)} · 사진을 고르고 인증 버튼을 눌러줘. 자동으로 압축해서 올려.</p>
+    <p class="sub">${esc(p.nickname)} · 사진을 고르고 인증 버튼을 눌러주세요. 자동으로 압축해서 올려드려요.</p>
     <div class="drop" id="drop">📷 사진 선택하기</div>
     <input type="file" accept="image/*" id="file" style="display:none" />
     <img class="prev" id="prev" />
@@ -535,7 +594,7 @@ function openUpload(pid, week){
     const nm = (f.name||'').toLowerCase();
     const heic = /image\/hei[cf]/i.test(f.type) || /\.(heic|heif)$/i.test(nm);
     drop.classList.remove('has');
-    drop.textContent = heic ? '📷 HEIC 변환 중… (몇 초 걸려)' : '압축 중…';
+    drop.textContent = heic ? '📷 HEIC 변환 중… (몇 초 걸려요)' : '압축 중…';
     okB.disabled = true;
     try{
       pendingBlob = await compress(f);
@@ -546,9 +605,9 @@ function openUpload(pid, week){
       console.error(e);
       prev.style.display='none';
       if(e && e.message==='HEIC-LIB-MISSING'){
-        toast('HEIC 변환 모듈을 못 불러왔어. 인터넷 확인 후 다시 시도해줘.');
+        toast('HEIC 변환 모듈을 못 불러왔어요. 인터넷 확인 후 다시 시도해주세요.');
       } else {
-        toast('이미지를 못 읽었어. 다른 파일로 해볼래?');
+        toast('이미지를 못 읽었어요. 다른 파일로 해볼까요?');
       }
       drop.textContent='📷 사진 선택하기';
     }
@@ -558,7 +617,7 @@ function openUpload(pid, week){
 }
 
 async function doUpload(pid, week, btn){
-  if(!pendingBlob){ toast('사진을 먼저 골라줘'); return; }
+  if(!pendingBlob){ toast('사진을 먼저 골라주세요'); return; }
   btn.disabled=true; btn.innerHTML='<span class="busy"></span>올리는 중';
   try{
     const p = people.find(x=>x.id===pid);
@@ -573,7 +632,7 @@ async function doUpload(pid, week, btn){
     if(oldPath && oldPath!==path){ storage.ref(oldPath).delete().catch(()=>{}); }
     hideOverlay(); toast(`${week}주차 인증 완료! 🎉`);
   }catch(e){
-    console.error(e); toast('업로드 실패. Storage 규칙/용량을 확인해줘.');
+    console.error(e); toast('업로드 실패. Storage 규칙/용량을 확인해주세요.');
     btn.disabled=false; btn.textContent='인증하기';
   }
 }
@@ -582,7 +641,8 @@ function openImage(pid, week){
   const p = people.find(x=>x.id===pid);
   const cert = p?.weeks?.[String(week)];
   if(!cert) return;
-  const canEdit = isAdmin || (me && me.id===pid && weekState(week,Date.now())==='open');
+  const adminEditing = isAdmin && adminEditPid===pid;
+  const canEdit = adminEditing || (me && me.id===pid && weekState(week,Date.now())==='open');
   const box = document.getElementById('modalBox');
   box.innerHTML = `
     <h3>${esc(p.nickname)} · ${week}주차</h3>
@@ -592,7 +652,7 @@ function openImage(pid, week){
     <div class="modal-actions">
       <button class="primary sec" id="ivClose">닫기</button>
       ${canEdit?`<button class="primary" id="ivEdit">수정</button>`:''}
-      ${isAdmin?`<button class="primary" id="ivDel" style="background:var(--warn)">삭제</button>`:''}
+      ${adminEditing?`<button class="primary" id="ivDel" style="background:var(--warn)">삭제</button>`:''}
     </div>`;
   showOverlay();
   document.getElementById('ivClose').onclick = hideOverlay;
@@ -601,7 +661,7 @@ function openImage(pid, week){
 }
 
 async function deleteCert(pid, week){
-  if(!confirm(`${week}주차 인증을 삭제할까?`)) return;
+  if(!confirm(`${week}주차 인증을 삭제할까요?`)) return;
   try{
     const p = people.find(x=>x.id===pid);
     const path = p?.weeks?.[String(week)]?.path;
@@ -609,34 +669,73 @@ async function deleteCert(pid, week){
       [`weeks.${week}`]: firebase.firestore.FieldValue.delete()
     });
     if(path) storage.ref(path).delete().catch(()=>{});
-    hideOverlay(); toast('삭제했어');
+    hideOverlay(); toast('삭제했어요');
   }catch(e){ console.error(e); toast('삭제 실패'); }
 }
 
 document.getElementById('admBtn').onclick = ()=>{
   const b=document.getElementById('admBtn');
-  if(isAdmin){ isAdmin=false; b.classList.remove('on'); b.textContent='관리자'; render(); toast('관리자 모드 해제'); return; }
+  if(isAdmin){ isAdmin=false; adminEditPid=null; b.classList.remove('on'); b.textContent='관리자'; render(); toast('관리자 모드 해제'); return; }
   const pw = prompt('관리자 비밀번호');
   if(pw===null) return;
   if(pw===ADMIN_PASSWORD){ isAdmin=true; b.classList.add('on'); b.textContent='관리자 ✓'; render(); toast('관리자 모드 ON'); }
-  else toast('비밀번호가 틀렸어');
+  else toast('비밀번호가 틀렸어요');
 };
 
 async function setStatus(pid, status){
   try{ await db.collection('participants').doc(pid).update({status});
-    toast(status==='approved'?'승인했어 ✅':'거절했어'); }
+    toast(status==='approved'?'승인했어요 ✅':'거절했어요'); }
   catch(e){ console.error(e); toast('처리 실패'); }
 }
 async function deleteParticipant(pid){
   const p = people.find(x=>x.id===pid);
-  if(!confirm(`"${p?.nickname}" 참가자와 모든 인증을 삭제할까?`)) return;
+  if(!confirm(`"${p?.nickname}" 참가자를 휴지통으로 옮길까요? (인증 기록은 유지되고, 나중에 복구할 수 있어요)`)) return;
   try{
-    if(p?.weeks) for(const k in p.weeks){ if(p.weeks[k].path) storage.ref(p.weeks[k].path).delete().catch(()=>{}); }
-    await db.collection('participants').doc(pid).delete();
+    await db.collection('participants').doc(pid).update({
+      status:'trashed', prevStatus: p?.status||'approved', trashedAt: Date.now()
+    });
+    adminEditPid = null;
     if(me && me.id===pid) logout();
-    toast('삭제 완료');
-  }catch(e){ console.error(e); toast('삭제 실패'); }
+    toast('휴지통으로 옮겼어요 🗑️');
+  }catch(e){ console.error(e); toast('처리 실패'); }
 }
+
+function openTrash(){
+  const box = document.getElementById('modalBox');
+  const trashed = people.filter(p=>p.status==='trashed')
+                        .sort((a,b)=>(b.trashedAt||0)-(a.trashedAt||0));
+  box.innerHTML = `
+    <h3>🗑️ 휴지통</h3>
+    <p class="sub">삭제된 참가자예요. 복구하면 인증 기록 그대로 현황판에 다시 나타나요.</p>
+    ${trashed.length ? trashed.map(p=>`
+      <div class="prow">
+        <span class="pn">${esc(p.nickname)}</span>
+        <span class="p4">···${esc(p.last4||'')}</span>
+        <button class="mini ok" data-restore="${p.id}">복구</button>
+      </div>`).join('') : `<div class="empty-state">휴지통이 비어있어요.</div>`}
+    <div class="modal-actions">
+      <button class="primary sec" id="trashClose">닫기</button>
+    </div>`;
+  showOverlay();
+  document.getElementById('trashClose').onclick = hideOverlay;
+  box.querySelectorAll('[data-restore]').forEach(b=>{
+    b.onclick = ()=> restoreParticipant(b.dataset.restore);
+  });
+}
+
+async function restoreParticipant(pid){
+  try{
+    const p = people.find(x=>x.id===pid);
+    await db.collection('participants').doc(pid).update({
+      status: p?.prevStatus || 'approved',
+      prevStatus: firebase.firestore.FieldValue.delete(),
+      trashedAt: firebase.firestore.FieldValue.delete()
+    });
+    toast('복구했어요 ✅');
+    openTrash();
+  }catch(e){ console.error(e); toast('복구 실패'); }
+}
+document.getElementById('trashBtn').onclick = openTrash;
 
 /* HEIC(아이폰/맥 기본 사진 포맷)면 JPEG로 먼저 변환. 아니면 원본 그대로 반환 */
 async function toDecodable(file){
