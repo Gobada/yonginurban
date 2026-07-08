@@ -138,6 +138,8 @@
     opacity:0; transition:.25s; z-index:99; pointer-events:none; max-width:90%}
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
   .center-load{text-align:center; padding:60px 0; color:var(--muted)}
+  .ver{text-align:center; color:var(--muted); opacity:.6; font-size:11px; font-weight:600;
+    letter-spacing:.02em; margin:28px 0 6px}
 </style>
 </head>
 <body>
@@ -183,6 +185,8 @@
     <div id="adminPending"></div>
     <div id="boardList"><div class="center-load">현황 불러오는 중…</div></div>
   </section>
+
+  <div class="ver" id="verTag"></div>
 </div>
 
 <div class="overlay" id="ov">
@@ -195,6 +199,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
+<!-- HEIC(아이폰/맥 기본 사진 포맷) → JPEG 자동 변환용 -->
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 
 <script>
 /* ==========================================================================
@@ -212,6 +218,9 @@ const firebaseConfig = {
 
 /* 관리자 비밀번호 (원하면 바꿔도 됨) */
 const ADMIN_PASSWORD = "1234";
+
+/* 버전 표시 (수정할 때마다 올려주면 배포 반영 확인용) */
+const APP_VERSION = "v2026.07.08 · HEIC 자동변환";
 
 /* 인증 일정: 매주 화 06:00 ~ 다음 월 18:00 (한국시간), 7/7(화) 시작, 10주 */
 const TOTAL_WEEKS = 10;
@@ -242,6 +251,7 @@ function toast(msg){
 }
 
 (async function init(){
+  document.getElementById('verTag').textContent = APP_VERSION;
   if(firebaseConfig.apiKey.includes("여기에")){
     banner("⚠️ 아직 Firebase 설정이 안 됐어. 설명서(README) 보고 index.html 위쪽 firebaseConfig 6줄을 채워줘.");
     document.getElementById('hdrsub').textContent = "설정 필요";
@@ -524,13 +534,26 @@ function openUpload(pid, week){
   drop.onclick = (e)=>{ if(e.target!==fileEl) fileEl.click(); };
   fileEl.onchange = async ()=>{
     const f = fileEl.files[0]; if(!f) return;
-    drop.textContent='압축 중…';
+    const nm = (f.name||'').toLowerCase();
+    const heic = /image\/hei[cf]/i.test(f.type) || /\.(heic|heif)$/i.test(nm);
+    drop.classList.remove('has');
+    drop.textContent = heic ? '📷 HEIC 변환 중… (몇 초 걸려)' : '압축 중…';
+    okB.disabled = true;
     try{
       pendingBlob = await compress(f);
       prev.src = URL.createObjectURL(pendingBlob); prev.style.display='block';
       drop.textContent='✅ 사진 준비됨 (다시 누르면 변경)'; drop.classList.add('has');
       okB.disabled=false;
-    }catch(e){ console.error(e); toast('이미지를 못 읽었어. 다른 파일로 해볼래?'); drop.textContent='📷 사진 선택하기'; }
+    }catch(e){
+      console.error(e);
+      prev.style.display='none';
+      if(e && e.message==='HEIC-LIB-MISSING'){
+        toast('HEIC 변환 모듈을 못 불러왔어. 인터넷 확인 후 다시 시도해줘.');
+      } else {
+        toast('이미지를 못 읽었어. 다른 파일로 해볼래?');
+      }
+      drop.textContent='📷 사진 선택하기';
+    }
   };
   document.getElementById('upCancel').onclick = hideOverlay;
   okB.onclick = ()=> doUpload(pid, week, okB);
@@ -617,7 +640,20 @@ async function deleteParticipant(pid){
   }catch(e){ console.error(e); toast('삭제 실패'); }
 }
 
+/* HEIC(아이폰/맥 기본 사진 포맷)면 JPEG로 먼저 변환. 아니면 원본 그대로 반환 */
+async function toDecodable(file){
+  const name = (file.name || '').toLowerCase();
+  const isHeic = /image\/hei[cf]/i.test(file.type) || /\.(heic|heif)$/i.test(name);
+  if(!isHeic) return file;
+  if(typeof heic2any !== 'function'){
+    throw new Error('HEIC-LIB-MISSING');
+  }
+  const out = await heic2any({ blob:file, toType:'image/jpeg', quality:0.9 });
+  return Array.isArray(out) ? out[0] : out;
+}
+
 async function compress(file){
+  file = await toDecodable(file);
   let bitmap;
   try{ bitmap = await createImageBitmap(file, {imageOrientation:'from-image'}); }
   catch(_){
