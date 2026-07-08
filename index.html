@@ -201,13 +201,12 @@
    1) 여기만 채우면 끝!  Firebase 콘솔 > 프로젝트 설정 > 내 앱(웹) 에서 복사
    ========================================================================== */
 const firebaseConfig = {
-  apiKey: "AIzaSyDMzNeq_DINevwWXutqrYXpaBy6dp9Yuos",
-  authDomain: "shulook-6de61.firebaseapp.com",
-  projectId: "shulook-6de61",
-  storageBucket: "shulook-6de61.firebasestorage.app",
-  messagingSenderId: "876002839235",
-  appId: "1:876002839235:web:7949a0b2fad6da865d3076",
-  measurementId: "G-78N3XQ5Z6E"
+  apiKey:            "여기에_붙여넣기",
+  authDomain:        "여기에_붙여넣기",
+  projectId:         "여기에_붙여넣기",
+  storageBucket:     "여기에_붙여넣기",
+  messagingSenderId: "여기에_붙여넣기",
+  appId:             "여기에_붙여넣기"
 };
 
 /* 관리자 비밀번호 (원하면 바꿔도 됨) */
@@ -295,9 +294,11 @@ function fmt(ms){
 function render(){
   const now = Date.now();
   renderPeriod(now);
-  if(!me){ showLogin(); return; }
-  const fresh = people.find(p=>p.id===me.id);
-  if(fresh){ me = {...me, ...fresh}; }
+  if(!me && !isAdmin){ showLogin(); return; }
+  if(me){
+    const fresh = people.find(p=>p.id===me.id);
+    if(fresh){ me = {...me, ...fresh}; }
+  }
   document.getElementById('loginView').style.display='none';
   document.getElementById('boardView').style.display='block';
   updateWhoBtn();
@@ -334,9 +335,17 @@ function showLogin(){
 }
 function updateWhoBtn(){
   const b = document.getElementById('whoBtn');
-  b.style.display='inline-block';
-  b.textContent = `${me.nickname} ⏻`;
-  b.onclick = logout;
+  if(me){
+    b.style.display='inline-block';
+    b.textContent = `${me.nickname} ⏻`;
+    b.onclick = logout;
+  } else if(isAdmin){
+    b.style.display='inline-block';
+    b.textContent = '로그인';
+    b.onclick = ()=>{ isAdmin=false; const a=document.getElementById('admBtn'); a.classList.remove('on'); a.textContent='관리자'; render(); };
+  } else {
+    b.style.display='none';
+  }
 }
 
 function approvedSorted(){
