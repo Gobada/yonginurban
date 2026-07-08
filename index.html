@@ -74,6 +74,8 @@
   .primary.sec{background:var(--card); color:var(--stamp); border:1.5px solid var(--stamp)}
   .primary[disabled]{opacity:.5}
   .hint{font-size:12.5px; color:var(--muted); text-align:center; margin-top:14px}
+  .linklike{display:block; width:100%; margin-top:12px; border:none; background:none;
+    color:var(--stamp); font-size:13px; font-weight:700; text-decoration:underline; text-underline-offset:3px}
 
   .legend{display:flex; gap:14px; align-items:center; margin:10px 0 16px; font-size:12px; color:var(--muted); flex-wrap:wrap}
   .legend .dot{display:inline-flex; align-items:center; gap:5px}
@@ -202,6 +204,7 @@
         </div>
       </div>
       <button class="primary" id="loginBtn">들어가기</button>
+      <button type="button" class="linklike" id="findNickBtn">닉네임을 잊으셨나요?</button>
       <div class="hint">처음이면 등록 요청이 관리자에게 전달돼요.<br>승인되면 인증할 수 있어요.</div>
     </div>
   </section>
@@ -257,7 +260,7 @@ const firebaseConfig = {
 const ADMIN_PASSWORD = "1234";
 
 /* 버전 표시 (수정할 때마다 올려주면 배포 반영 확인용) */
-const APP_VERSION = "v2026.07.10c";
+const APP_VERSION = "v2026.07.10d";
 
 /* 인증 일정: 매주 화 06:00 ~ 다음 월 18:00 (한국시간), 7/7(화) 시작, 10주 */
 const TOTAL_WEEKS = 10;
@@ -381,6 +384,11 @@ function showLogin(){
   document.getElementById('loginView').style.display='block';
   document.getElementById('boardView').style.display='none';
   document.getElementById('whoBtn').style.display='none';
+  // 로그인 화면에선 관리자 전용 버튼들도 모두 숨김 (관리자 해제 시 잔존 방지)
+  document.getElementById('statBtn').style.display='none';
+  document.getElementById('trashBtn').style.display='none';
+  document.getElementById('infoBtn').style.display='none';
+  document.body.style.paddingBottom='';
 }
 function updateWhoBtn(){
   const trashBtn = document.getElementById('trashBtn');
@@ -518,6 +526,41 @@ function renderAdminPending(now){
 
 document.getElementById('loginBtn').onclick = login;
 document.getElementById('p4').addEventListener('keydown', e=>{ if(e.key==='Enter') login(); });
+document.getElementById('findNickBtn').onclick = openFindNickname;
+
+function openFindNickname(){
+  const box = document.getElementById('modalBox');
+  box.innerHTML = `
+    <h3>닉네임 찾기</h3>
+    <p class="sub">등록할 때 쓴 전화번호 뒷 4자리를 입력하면 닉네임을 알려드려요.</p>
+    <input class="fld" id="fnP4" inputmode="numeric" maxlength="4" placeholder="예: 1234" autocomplete="off" />
+    <div id="fnResult" style="margin-top:14px"></div>
+    <div class="modal-actions">
+      <button class="primary sec" id="fnClose">닫기</button>
+      <button class="primary" id="fnSearch">찾기</button>
+    </div>`;
+  showOverlay();
+  const input = document.getElementById('fnP4');
+  input.focus();
+  const doSearch = ()=>{
+    const last4 = input.value.trim();
+    const res = document.getElementById('fnResult');
+    if(!/^\d{4}$/.test(last4)){ toast('전화번호 뒷 4자리(숫자)를 정확히 입력해주세요'); return; }
+    const matches = people.filter(p=> (p.last4||'')===last4 && p.status!=='trashed' && p.status!=='rejected');
+    if(!matches.length){
+      res.innerHTML = `<div class="empty-state" style="padding:14px 0">일치하는 닉네임이 없어요.<br>처음이라면 로그인 화면에서 등록해주세요.</div>`;
+      return;
+    }
+    res.innerHTML = `<div class="section-title" style="margin:0 0 8px">찾은 닉네임 (${matches.length})</div>` + matches.map(p=>`
+      <div class="prow">
+        <span class="pn">${esc(p.nickname)}</span>
+        <span class="p4">${p.status==='pending'?'승인 대기':''}</span>
+      </div>`).join('');
+  };
+  document.getElementById('fnClose').onclick = hideOverlay;
+  document.getElementById('fnSearch').onclick = doSearch;
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter') doSearch(); });
+}
 
 async function login(){
   if(!ready){ toast('연결 중이에요, 잠깐만요!'); return; }
