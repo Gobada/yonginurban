@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<!-- 캐시 방지: 배포 후 옛 버전이 남는 현상(특히 iOS Safari) 완화 -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
 <title>매주 그림 인증</title>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -253,7 +257,7 @@ const firebaseConfig = {
 const ADMIN_PASSWORD = "1234";
 
 /* 버전 표시 (수정할 때마다 올려주면 배포 반영 확인용) */
-const APP_VERSION = "v2026.07.10b";
+const APP_VERSION = "v2026.07.10c";
 
 /* 인증 일정: 매주 화 06:00 ~ 다음 월 18:00 (한국시간), 7/7(화) 시작, 10주 */
 const TOTAL_WEEKS = 10;
