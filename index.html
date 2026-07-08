@@ -220,7 +220,7 @@ const firebaseConfig = {
 const ADMIN_PASSWORD = "1234";
 
 /* 버전 표시 (수정할 때마다 올려주면 배포 반영 확인용) */
-const APP_VERSION = "v2026.07.08 · HEIC 자동변환";
+const APP_VERSION = "v2026.07.08b · 업로드 수정";
 
 /* 인증 일정: 매주 화 06:00 ~ 다음 월 18:00 (한국시간), 7/7(화) 시작, 10주 */
 const TOTAL_WEEKS = 10;
@@ -516,10 +516,8 @@ function openUpload(pid, week){
   box.innerHTML = `
     <h3>${week}주차 ${has?'그림 수정':'그림 인증'}</h3>
     <p class="sub">${esc(p.nickname)} · 사진을 고르고 인증 버튼을 눌러줘. 자동으로 압축해서 올려.</p>
-    <label class="drop" id="drop">
-      <input type="file" accept="image/*" id="file" style="display:none" />
-      📷 사진 선택하기
-    </label>
+    <div class="drop" id="drop">📷 사진 선택하기</div>
+    <input type="file" accept="image/*" id="file" style="display:none" />
     <img class="prev" id="prev" />
     <div class="modal-actions">
       <button class="primary sec" id="upCancel">취소</button>
@@ -531,7 +529,7 @@ function openUpload(pid, week){
   const drop = document.getElementById('drop');
   const prev = document.getElementById('prev');
   const okB = document.getElementById('upOk');
-  drop.onclick = (e)=>{ if(e.target!==fileEl) fileEl.click(); };
+  drop.onclick = ()=> fileEl.click();
   fileEl.onchange = async ()=>{
     const f = fileEl.files[0]; if(!f) return;
     const nm = (f.name||'').toLowerCase();
